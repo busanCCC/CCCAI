@@ -1,36 +1,24 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# 📂 Project: 부산지구 CCC AI 순장 (AI Shepherd)
+>"지식은 AI처럼, 마음은 순장처럼" 일반 LLM의 파편화된 조언이 아닌, CCC의 비전과 <새생활의 시작>에 기반하여 순원들의 고민을 함께 나누고 가이드하는 AI 서비스입니다.
 
-## Getting Started
+## 🚀 프로젝트 배경
+- 정체성 유지: 일반 LLM 사용 시 발생할 수 있는 비성경적/비본질적 답변 방지.
 
-First, run the development server:
+- 현장 중심: 순장들이 순모임 현장에서 겪는 실질적인 고민을 CCC의 훈련 체계(<새생활의 시작> 등) 내에서 해결.
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+- 인격적 연결: AI에 의존하는 것이 아니라, AI를 통해 얻은 통찰을 가지고 실제 간사/순장과의 인격적 교제로 이어지도록 돕는 징검다리 역할.
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## 🛠 Tech Stack
+### Frontend
+- Framework: Next.js 16 (App Router)
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+- State Management: Zustand 
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+- Styling: Tailwind CSS, shadcn/ui 
 
-## Learn More
+### Backend
+- API Framework: FastAPI 
 
-To learn more about Next.js, take a look at the following resources:
+- AI Orchestration: Dify 
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+- Deployment: Vercel
