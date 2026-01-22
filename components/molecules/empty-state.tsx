@@ -1,31 +1,9 @@
 "use client";
 import { EXAMPLE_QUESTIONS } from "@/features/chat/chat.data";
-import { motion, Variants } from "framer-motion";
 import { useEffect, useState } from "react";
 
 type EmptyStateProps = {
   onSuggestionClick: (question: string) => void;
-};
-
-const containerVariants: Variants = {
-  hidden: { opacity: 0 },
-  visible: {
-    opacity: 1,
-    transition: {
-      staggerChildren: 0.15,
-    },
-  },
-};
-
-const itemVariants: Variants = {
-  hidden: { opacity: 0 },
-  visible: {
-    opacity: 1,
-    transition: {
-      duration: 0.5,
-      ease: "easeOut",
-    },
-  },
 };
 
 export function EmptyState({ onSuggestionClick }: EmptyStateProps) {
@@ -41,33 +19,31 @@ export function EmptyState({ onSuggestionClick }: EmptyStateProps) {
   if (suggestions.length === 0) return null;
 
   return (
-    <motion.div
-      className="flex min-h-[60dvh] flex-col items-center justify-center gap-8"
-      variants={containerVariants}
-      initial="hidden"
-      animate="visible"
-    >
-      <motion.div className="relative" variants={itemVariants}>
+    <div className="flex min-h-[60dvh] flex-col items-center justify-center gap-8 animate-fade-in">
+      <div className="relative animate-slide-up">
         <div className="absolute inset-0 rounded-full bg-primary/20 blur-2xl" />
-        <div className="relative max-w-[280px] rounded-[2.5rem] border border-primary/20 bg-card/50 p-8 shadow-md backdrop-blur-md">
+        <div className="relative max-w-[400px] rounded-[2.5rem] border border-primary/20 bg-card/50 p-8 shadow-md backdrop-blur-md">
           <p className="text-sm font-medium leading-relaxed text-foreground/80 md:text-base">
             <span className="font-bold">AI 씨앗 순장</span>님과 대화를 해보세요.
           </p>
         </div>
-      </motion.div>
+      </div>
 
       <div className="flex w-full flex-col gap-2 px-4">
         {suggestions.map((question, index) => (
-          <motion.button
-            key={index}
-            variants={itemVariants}
+          <button
+            key={question}
             onClick={() => onSuggestionClick(question)}
-            className="w-full rounded-xl border border-white/20 bg-white/40 px-4 py-3 text-sm text-foreground/80 shadow-sm backdrop-blur-sm transition-all hover:bg-white/60 hover:scale-[1.02] active:scale-95 text-left"
+            className="w-full rounded-2xl border border-border/50 bg-card/30 px-6 py-4 text-left text-sm text-foreground/80 transition-all hover:bg-accent/50 hover:text-foreground active:scale-[0.98] md:text-base animate-slide-up"
+            style={{
+              animationDelay: `${(index + 1) * 0.1}s`,
+              animationFillMode: "both",
+            }}
           >
             {question}
-          </motion.button>
+          </button>
         ))}
       </div>
-    </motion.div>
+    </div>
   );
 }

@@ -12,8 +12,6 @@ type MessageBubbleProps = {
   processingStatus?: string | null;
 };
 
-import { AnimatePresence, motion } from "framer-motion";
-
 export const MessageBubble = memo(function MessageBubble({
   message,
   isStreaming,
@@ -24,16 +22,9 @@ export const MessageBubble = memo(function MessageBubble({
     !isUser && isStreaming && processingStatus && !message.content;
 
   return (
-    <motion.div
-      layout="position"
-      initial={{ opacity: 0, y: 10 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{
-        duration: 0.3,
-        ease: "easeOut",
-      }}
+    <div
       className={cn(
-        "flex w-full mb-4",
+        "flex w-full mb-4 animate-slide-up",
         isUser ? "justify-end" : "justify-start",
       )}
     >
@@ -51,41 +42,30 @@ export const MessageBubble = memo(function MessageBubble({
           </p>
         ) : (
           <div className="relative min-h-[24px]">
-            <AnimatePresence mode="wait">
-              {showProcessingStatus ? (
-                <motion.div
-                  key={processingStatus}
-                  initial={{ opacity: 0, y: 5 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  exit={{ opacity: 0, y: -5 }}
-                  transition={{ duration: 0.3 }}
-                  className="flex items-center gap-2 text-muted-foreground"
+            {showProcessingStatus ? (
+              <div
+                key="status"
+                className="flex items-center gap-2 text-muted-foreground animate-fade-in"
+              >
+                <span className="relative flex h-2 w-2">
+                  <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-primary/75 opacity-75"></span>
+                  <span className="relative inline-flex rounded-full h-2 w-2 bg-primary"></span>
+                </span>
+                <span>{processingStatus}</span>
+              </div>
+            ) : (
+              <div key="content" className="animate-fade-in">
+                <Streamdown
+                  className="streamdown leading-relaxed space-y-4"
+                  isAnimating={Boolean(isStreaming)}
                 >
-                  <span className="relative flex h-2 w-2">
-                    <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-primary/75 opacity-75"></span>
-                    <span className="relative inline-flex rounded-full h-2 w-2 bg-primary"></span>
-                  </span>
-                  <span>{processingStatus}</span>
-                </motion.div>
-              ) : (
-                <motion.div
-                  key="content"
-                  initial={{ opacity: 0 }}
-                  animate={{ opacity: 1 }}
-                  transition={{ duration: 0.3 }}
-                >
-                  <Streamdown
-                    className="streamdown leading-relaxed space-y-4"
-                    isAnimating={Boolean(isStreaming)}
-                  >
-                    {message.content || " "}
-                  </Streamdown>
-                </motion.div>
-              )}
-            </AnimatePresence>
+                  {message.content || " "}
+                </Streamdown>
+              </div>
+            )}
           </div>
         )}
       </div>
-    </motion.div>
+    </div>
   );
 });
