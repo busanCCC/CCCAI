@@ -35,7 +35,7 @@ export function ChatInput({
         placeholder="무엇이든 물어보세요..."
         disabled={disabled}
         aria-label="메시지 입력"
-        className="min-h-[48px] max-h-[120px] flex-1 shadow-none resize-none bg-transparent border-0 focus-visible:ring-0 px-4 py-3 text-sm placeholder:text-muted-foreground/70"
+        className="min-h-[48px] max-h-[120px] flex-1 shadow-none resize-none bg-transparent border-0 focus-visible:ring-0 px-4 py-3 text-base sm:text-sm placeholder:text-muted-foreground/70"
         rows={1}
       />
       <Button
