@@ -1,7 +1,6 @@
 "use client";
 import { EXAMPLE_QUESTIONS } from "@/features/chat/chat.data";
 import { useEffect, useState } from "react";
-import Image from "next/image";
 import SeedLottie from "./seed-lottie";
 type EmptyStateProps = {
   onSuggestionClick: (question: string) => void;
