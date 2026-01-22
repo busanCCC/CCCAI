@@ -30,16 +30,15 @@ const itemVariants: Variants = {
 
 export function EmptyState({ onSuggestionClick }: EmptyStateProps) {
   const [suggestions, setSuggestions] = useState<string[]>([]);
-  const [isMounted, setIsMounted] = useState(false);
 
   useEffect(() => {
-    // NOTE: 컴포넌트 마운트 시 랜덤 질문 3개 선택
+    // NOTE: 컴포넌트 마운트 시 한 번만 랜덤 질문 3개 선택
     const shuffled = [...EXAMPLE_QUESTIONS].sort(() => 0.5 - Math.random());
     setSuggestions(shuffled.slice(0, 3));
-    setIsMounted(true);
   }, []);
 
-  if (!isMounted) return null;
+  // hydration mismatch 방지를 위해 suggestions가 없을 때는 렌더링하지 않음 (또는 스켈레톤)
+  if (suggestions.length === 0) return null;
 
   return (
     <motion.div

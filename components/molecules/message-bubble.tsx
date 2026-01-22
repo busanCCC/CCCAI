@@ -1,6 +1,7 @@
 "use client";
 // NOTE: 사용자/어시스턴트 역할 메시지 버블
 import { Streamdown } from "streamdown";
+import { memo } from "react";
 
 import type { ChatMessage } from "@/features/chat/chat.types";
 import { cn } from "@/lib/utils";
@@ -13,7 +14,7 @@ type MessageBubbleProps = {
 
 import { AnimatePresence, motion } from "framer-motion";
 
-export function MessageBubble({
+export const MessageBubble = memo(function MessageBubble({
   message,
   isStreaming,
   processingStatus,
@@ -24,12 +25,12 @@ export function MessageBubble({
 
   return (
     <motion.div
-      initial={{ opacity: 0 }}
-      animate={{ opacity: 1 }}
+      layout="position"
+      initial={{ opacity: 0, y: 10 }}
+      animate={{ opacity: 1, y: 0 }}
       transition={{
         duration: 0.3,
         ease: "easeOut",
-        delay: !isUser && isStreaming ? 0.4 : 0,
       }}
       className={cn(
         "flex w-full mb-4",
@@ -87,4 +88,4 @@ export function MessageBubble({
       </div>
     </motion.div>
   );
-}
+});
