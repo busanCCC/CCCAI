@@ -7,8 +7,8 @@ export const metadata: Metadata = {
   title: "씨앗 순장님과 대화하기",
   description: "TST에 등장한 AI 씨앗 순장님과 대화해보세요!",
   openGraph: {
-    title: "서비스 제목",
-    description: "요약 설명",
+    title: "씨앗 순장님과 대화하기",
+    description: "TST에 등장한 AI 씨앗 순장님과 대화해보세요!",
     images: [
       {
         url: "https://c-at-ai.vercel.app/img/og.jpg",
