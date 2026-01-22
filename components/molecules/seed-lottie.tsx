@@ -24,7 +24,7 @@ export default function SeedLottie() {
   if (!selectedSource) return null;
 
   return (
-    <div className="relative w-[200px] h-[200px] rounded-full border overflow-hidden flex items-center justify-center [clip-path:circle(50%)] mb-4">
+    <div className="relative w-[120px] h-[120px] sm:w-[140px] sm:h-[140px] md:w-[160px] md:h-[160px] rounded-full border overflow-hidden flex items-center justify-center [clip-path:circle(50%)] mb-2 sm:mb-4">
       <DotLottieReact 
         src={selectedSource} 
         loop

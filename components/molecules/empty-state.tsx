@@ -20,11 +20,11 @@ export function EmptyState({ onSuggestionClick }: EmptyStateProps) {
   if (suggestions.length === 0) return null;
 
   return (
-    <div className="flex min-h-[60dvh] flex-col items-center justify-center gap-8 animate-fade-in">
+    <div className="flex min-h-[60dvh] flex-col items-center justify-center gap-4 sm:gap-8 animate-fade-in">
       <div className="relative animate-slide-up flex flex-col items-center justify-center">
           <SeedLottie />
         <div className="absolute inset-0 rounded-full bg-primary/20 blur-2xl" />
-        <div className="relative max-w-[400px] rounded-[2.5rem] border border-primary/20 bg-card/50 p-8 shadow-md backdrop-blur-md">
+        <div className="relative max-w-[400px] rounded-[2.5rem] border border-primary/20 bg-card/50 p-4 sm:p-8 shadow-md backdrop-blur-md">
           <p className="text-sm font-medium leading-relaxed text-foreground/80 md:text-base">
             <span className="font-bold">AI 씨앗 순장</span>님과 대화를 해보세요.
           </p>
