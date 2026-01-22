@@ -2,7 +2,7 @@
 import { EXAMPLE_QUESTIONS } from "@/features/chat/chat.data";
 import { useEffect, useState } from "react";
 import Image from "next/image";
-import { DotLottieReact } from "@lottiefiles/dotlottie-react";
+import SeedLottie from "./seed-lottie";
 type EmptyStateProps = {
   onSuggestionClick: (question: string) => void;
 };
@@ -20,18 +20,9 @@ export function EmptyState({ onSuggestionClick }: EmptyStateProps) {
   if (suggestions.length === 0) return null;
 
   return (
-    <div className="flex min-h-[50dvh] sm:min-h-[60dvh] flex-col items-center justify-center gap-4 sm:gap-8 animate-fade-in">
+    <div className="flex min-h-[60dvh] flex-col items-center justify-center gap-4 sm:gap-8 animate-fade-in">
       <div className="relative animate-slide-up flex flex-col items-center justify-center">
-      <div className="relative w-[120px] h-[120px] sm:w-[140px] sm:h-[140px] md:w-[160px] md:h-[160px] rounded-full border overflow-hidden flex items-center justify-center [clip-path:circle(50%)] mb-2 sm:mb-4">
-          <DotLottieReact src="/lottie/seedAI_1.lottie" loop autoplay className="w-full h-full" />
-          {/* 비네트 효과 오버레이 */}
-          <div 
-            className="absolute inset-0 z-10 pointer-events-none rounded-full"
-            style={{
-              background: 'radial-gradient(circle, transparent 20%, rgba(255,255,255,0.8) 100%)'
-            }}
-          />
-        </div>
+          <SeedLottie />
         <div className="absolute inset-0 rounded-full bg-primary/20 blur-2xl" />
         <div className="relative max-w-[400px] rounded-[2.5rem] border border-primary/20 bg-card/50 p-4 sm:p-8 shadow-md backdrop-blur-md">
           <p className="text-sm font-medium leading-relaxed text-foreground/80 md:text-base">
