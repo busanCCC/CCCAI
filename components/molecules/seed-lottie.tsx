@@ -1,7 +1,8 @@
 "use client";
 
 import { DotLottieReact } from "@lottiefiles/dotlottie-react";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
+import type { DotLottie } from "@lottiefiles/dotlottie-react";
 
 const LOTTIE_SOURCES = [
   "/lottie/seedAI_1.lottie",
@@ -9,7 +10,11 @@ const LOTTIE_SOURCES = [
   "/lottie/seedAI_3.lottie",
 ];
 
-export default function SeedLottie() {
+type SeedLottieProps = {
+  onReady?: () => void;
+};
+
+export default function SeedLottie({ onReady }: SeedLottieProps) {
   const [selectedSource, setSelectedSource] = useState<string | null>(null);
 
   useEffect(() => {
@@ -21,6 +26,17 @@ export default function SeedLottie() {
     return () => clearTimeout(timeoutId);
   }, []);
 
+  const dotLottieRefCallback = useCallback(
+    (dotLottie: DotLottie | null) => {
+      if (dotLottie) {
+        dotLottie.addEventListener("load", () => {
+          onReady?.();
+        });
+      }
+    },
+    [onReady]
+  );
+
   if (!selectedSource) return null;
 
   return (
@@ -30,6 +46,7 @@ export default function SeedLottie() {
         loop
         autoplay 
         className="w-full h-full"
+        dotLottieRefCallback={dotLottieRefCallback}
       />
 
       {/* 비네트 효과 오버레이 */}
