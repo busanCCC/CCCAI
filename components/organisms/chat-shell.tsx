@@ -7,8 +7,6 @@ import { streamChat } from "@/features/chat/chat.api";
 import { useChatStore } from "@/features/chat/chat.store";
 import { useCallback, useEffect, useState } from "react";
 import { toast } from "sonner";
-import { FloatingMessages } from "@/components/molecules/floatingMessages";
-import { FLOAT_MESSAGES } from "@/features/float/float.data";
 
 export function ChatShell() {
   const {
