@@ -6,7 +6,6 @@ import { DotLottieReact } from "@lottiefiles/dotlottie-react";
 import type { DotLottie } from "@lottiefiles/dotlottie-react";
 import { ChevronDown } from "lucide-react";
 import Image from "next/image";
-import Link from "next/link";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { SECTIONS } from "@/features/TMI";
@@ -268,12 +267,12 @@ export default function SeedTMI() {
               </p>
             </div>
 
-            <Link 
-              href="/"
+            <Button 
+              onClick={() => router.push("/")}
               className="mt-4 px-8 py-4 rounded-full bg-linear-to-r from-primary to-amber-500 text-white font-semibold shadow-lg hover:shadow-xl hover:scale-105 active:scale-95 transition-all duration-200"
             >
               씨앗과 대화하기
-            </Link>
+            </Button>
           </div>
         </section>
       </div>
