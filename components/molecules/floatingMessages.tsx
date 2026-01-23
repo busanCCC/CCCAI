@@ -29,7 +29,7 @@ export const FloatingMessages: React.FC<{
 
   return (
     <div
-      className="absolute flex items-center text-center blur-[0.6px] pointer-events-none animate-float-up"
+      className="absolute blur-[0.6px] pointer-events-none animate-float-up"
       style={{ 
         left: `${randomValues.left}%`,
         animationDuration: `${randomValues.duration}s`,
