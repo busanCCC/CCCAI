@@ -7,6 +7,8 @@ import { streamChat } from "@/features/chat/chat.api";
 import { useChatStore } from "@/features/chat/chat.store";
 import { useCallback, useEffect, useState } from "react";
 import { toast } from "sonner";
+import { FloatingMessages } from "@/components/molecules/floatingMessages";
+import { FLOAT_MESSAGES } from "@/features/float/float.data";
 
 export function ChatShell() {
   const {
@@ -29,6 +31,16 @@ export function ChatShell() {
 
   const [input, setInput] = useState("");
   const [suggestionKey, setSuggestionKey] = useState(0);
+
+  // 중복 없이 셔플된 메시지 배열
+  const [shuffledMessages, setShuffledMessages] = useState<string[]>([]);
+  
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setShuffledMessages([...FLOAT_MESSAGES].sort(() => 0.5 - Math.random()));
+    }, 0);
+    return () => clearTimeout(timer);
+  }, []);
 
   useEffect(() => {
     initFromStorage();
@@ -109,6 +121,15 @@ export function ChatShell() {
 
         {/* Chat Thread Area (Scrollable) */}
         <div className="flex-1 min-h-0 w-full">
+        {messages.length === 0 && (
+          <div className="fixed inset-0 pointer-events-none overflow-hidden z-0">
+            {shuffledMessages.slice(0, 5).map((text, i) => (
+              <FloatingMessages key={i} delay={i * 5} text={text} />
+            ))}
+            <div className="absolute top-0 left-0 w-full h-full bg-[radial-gradient(circle_at_50%_20%,rgba(30,58,138,0.15),transparent_60%)]" />
+            <div className="absolute bottom-0 right-0 w-full h-full bg-[radial-gradient(circle_at_80%_80%,rgba(16,185,129,0.05),transparent_50%)]" />
+          </div>
+        )}
           <ChatThread
             key={suggestionKey}
             messages={messages}
