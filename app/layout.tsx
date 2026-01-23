@@ -11,7 +11,7 @@ export const metadata: Metadata = {
     description: "TST에 등장한 AI 씨앗 순장님과 대화해보세요!",
     images: [
       {
-        url: "https://c-at-ai.vercel.app/img/og.jpg",
+        url: "https://c-at-ai.vercel.app/img/og.png",
         width: 1200,
         height: 630,
       },
