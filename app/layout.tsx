@@ -1,5 +1,6 @@
 // NOTE: 전역 폰트 및 메타데이터가 포함된 루트 레이아웃
 import type { Metadata } from "next";
+import { Analytics } from "@vercel/analytics/next";
 import { Toaster } from "sonner";
 import "./globals.css";
 
@@ -29,6 +30,7 @@ export default function RootLayout({
       <body className="min-h-screen bg-background font-sans text-foreground antialiased">
         {children}
         <Toaster />
+        <Analytics />
       </body>
     </html>
   );
