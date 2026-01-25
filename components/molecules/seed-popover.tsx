@@ -48,7 +48,7 @@ export function SeedPopover() {
             
             <div className="mt-3 pt-3 border-t border-border/50">
               <p className="text-xs text-foreground/60">씨앗 순장님에 대해 더 알고 싶다면?</p>
-              <a href="/seedTMI" className="text-sm text-primary font-bold underline hover:text-primary/80">
+              <a href="/seedTMI" className="text-sm text-yellow-500 font-bold underline hover:text-yellow-400">
                 씨앗 순장의 TMI →
               </a>
             </div>

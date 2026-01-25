@@ -110,10 +110,11 @@ export default function SeedTMI() {
       </div>
 
       {/* 고정 헤더 */}
-      <header className="fixed top-0 left-0 right-0 z-50 px-4 py-4 md:px-0">
+      <header className="fixed top-0 left-0 right-0 z-50 px-4 py-6 md:px-0">
         <div className="mx-auto max-w-[600px] flex items-center justify-between">
           <SeedPopover />
           <Button type="button"
+          size="sm"
         variant="outline"
         onClick={() => router.push("/")}>
             씨앗과 대화하기
@@ -172,7 +173,7 @@ export default function SeedTMI() {
                 안녕!
               </h1>
               <p className="text-xl md:text-2xl text-foreground/80">
-                난 <span className="font-bold text-primary">씨앗 순장</span>이야!
+                난 <span className="font-bold text-yellow-400">씨앗 순장</span>이야!
               </p>
               <p className="text-lg md:text-xl text-foreground/60">
                 너랑 많은 <span className="font-semibold">대화</span>를 나누고 싶어!
@@ -227,7 +228,7 @@ export default function SeedTMI() {
                         key={textIndex}
                         className={`text-base md:text-lg leading-relaxed text-foreground/80 ${
                           text.startsWith("→") || text.startsWith('"') 
-                            ? "text-primary font-medium pl-4 border-l-2 border-primary/30 font-bold" 
+                            ? "text-yellow-500 font-medium pl-4 border-l-2 border-primary/30 font-bold" 
                             : ""
                         }`}
                       >
