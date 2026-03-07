@@ -3,7 +3,7 @@
 import { Button } from "@/components/ui/button";
 import { AuthControls } from "@/features/auth/ui/auth-controls";
 import type { ChatStatus } from "@/features/chat/model/types";
-import { SeedPopover } from "@/features/shell/ui/seed-popover";
+import { SeedPopover } from "./seed-popover";
 
 export function ChatHeader({
   status,
