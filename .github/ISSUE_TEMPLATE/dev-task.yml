@@ -1,0 +1,51 @@
+name: Dev Task
+description: 개발 작업 정의
+title: "[DEV] "
+labels: ["dev"]
+
+body:
+  - type: textarea
+    id: context
+    attributes:
+      label: Context
+      description: 이 작업이 필요한 이유
+      placeholder: ex) 로그인 API에서 토큰 만료 처리 필요
+    validations:
+      required: true
+
+  - type: textarea
+    id: scope
+    attributes:
+      label: Scope
+      description: 이번 작업에서 포함되는 범위
+      placeholder: |
+        - 로그인 API 수정
+        - 토큰 만료 처리
+        - 에러 메시지 개선
+    validations:
+      required: true
+
+  - type: textarea
+    id: implementation
+    attributes:
+      label: Implementation
+      description: 예상 구현 방식
+      placeholder: |
+        - middleware에서 토큰 검증
+        - refresh token 로직 추가
+
+  - type: textarea
+    id: todo
+    attributes:
+      label: Todo
+      placeholder: |
+        - [ ] API 수정
+        - [ ] 테스트 작성
+        - [ ] 문서 업데이트
+
+  - type: textarea
+    id: reference
+    attributes:
+      label: Reference
+      description: 참고 링크
+      placeholder: 관련 PR / 문서 / 디자인
