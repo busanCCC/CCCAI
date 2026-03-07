@@ -4,6 +4,8 @@ import { ChatInput } from "@/features/chat/ui/chat-input";
 import { ChatThread } from "@/features/chat/ui/chat-thread";
 import { streamChat } from "@/features/chat/api/stream-chat";
 import { useChatStore } from "@/features/chat/model/store";
+import { useAuthSession } from "@/features/auth/model/use-auth-session";
+import { Spinner } from "@/components/ui/spinner";
 import { ChatHeader } from "@/features/shell/ui/chat-header";
 import { useCallback, useEffect, useState } from "react";
 import { toast } from "sonner";
@@ -25,7 +27,9 @@ export function ChatShell() {
     setError,
     clearError,
     setProcessingStatus,
+    setUserId,
   } = useChatStore();
+  const { user, isLoading: isAuthLoading } = useAuthSession();
 
   const [input, setInput] = useState("");
   const [suggestionKey, setSuggestionKey] = useState(0);
@@ -33,6 +37,13 @@ export function ChatShell() {
   useEffect(() => {
     initFromStorage();
   }, [initFromStorage]);
+
+  useEffect(() => {
+    if (isAuthLoading) return;
+    if (user?.id) {
+      setUserId(user.id);
+    }
+  }, [isAuthLoading, setUserId, user?.id]);
 
   useEffect(() => {
     if (errorMessage) {
@@ -85,6 +96,24 @@ export function ChatShell() {
     setInput("");
     setSuggestionKey((prev) => prev + 1);
   }, [startNewConversation]);
+
+  if (isAuthLoading) {
+    return (
+      <main className="fixed inset-0 flex h-dvh w-full flex-col overflow-hidden bg-background text-foreground">
+        <div className="absolute inset-0 z-0 overflow-hidden bg-linear-to-br from-indigo-50/50 via-white to-yellow-50/50 pointer-events-none">
+          <div className="absolute top-0 left-0 h-[500px] w-[500px] rounded-full bg-primary/20 mix-blend-multiply blur-[120px]" />
+          <div className="absolute bottom-0 right-0 h-[420px] w-[420px] rounded-full bg-blue-300/20 mix-blend-multiply blur-[120px]" />
+        </div>
+
+        <div className="relative z-10 flex h-full w-full items-center justify-center">
+          <div className="flex flex-col items-center gap-3">
+            <Spinner className="size-8 text-foreground/80" />
+            <p className="text-xs text-foreground/60">로그인 정보 확인중</p>
+          </div>
+        </div>
+      </main>
+    );
+  }
 
   return (
     <main className="fixed inset-0 flex h-dvh w-full flex-col overflow-hidden bg-background text-foreground supports-[height:100cqh]:h-[100cqh] supports-[height:100svh]:h-[100svh]">

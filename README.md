@@ -14,9 +14,11 @@
 
 ## Environment Variables
 
-`.env.local` 파일을 생성하고 아래 값을 설정하세요.
+`.env` 또는 `.env.local` 파일을 생성하고 아래 값을 설정하세요.
 
 ```
+NEXT_PUBLIC_SUPABASE_URL=your_supabase_project_url
+NEXT_PUBLIC_SUPABASE_PUBLISHABLE_DEFAULT_KEY=your_supabase_publishable_key
 DIFY_BASE_URL=https://api.dify.ai/v1
 DIFY_API_KEY=your_api_key_here
 ```
