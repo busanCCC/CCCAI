@@ -27,6 +27,7 @@ type ChatState = {
   setError: (message: string) => void;
   clearError: () => void;
   setProcessingStatus: (status: string | null) => void;
+  setUserId: (userId: string) => void;
 };
 
 export const useChatStore = create<ChatState>((set) => ({
@@ -120,5 +121,10 @@ export const useChatStore = create<ChatState>((set) => ({
   },
   setProcessingStatus: (status) => {
     set({ processingStatus: status });
+  },
+  setUserId: (userId) => {
+    if (!userId) return;
+    writeStorage(STORAGE_KEYS.userId, userId);
+    set({ userId });
   },
 }));
