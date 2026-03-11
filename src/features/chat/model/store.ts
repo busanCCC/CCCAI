@@ -28,6 +28,7 @@ type ChatState = {
   clearError: () => void;
   setProcessingStatus: (status: string | null) => void;
   setUserId: (userId: string) => void;
+  loadConversation: (conversationId: string, messages: ChatMessage[]) => void;
 };
 
 export const useChatStore = create<ChatState>((set) => ({
@@ -126,5 +127,17 @@ export const useChatStore = create<ChatState>((set) => ({
     if (!userId) return;
     writeStorage(STORAGE_KEYS.userId, userId);
     set({ userId });
+  },
+  loadConversation: (conversationId, messages) => {
+    if (conversationId) {
+      writeStorage(STORAGE_KEYS.conversationId, conversationId);
+    }
+    set({
+      conversationId: conversationId || null,
+      messages,
+      status: "idle",
+      errorMessage: null,
+      processingStatus: null,
+    });
   },
 }));

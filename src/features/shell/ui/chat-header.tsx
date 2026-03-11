@@ -8,15 +8,28 @@ import { SeedPopover } from "./seed-popover";
 export function ChatHeader({
   status,
   onNewConversation,
+  isAuthenticated,
+  currentConversationId,
+  onSelectConversation,
+  isStreaming: isStreamingProp,
 }: {
   status: ChatStatus;
   onNewConversation: () => void;
+  isAuthenticated: boolean;
+  currentConversationId: string | null;
+  onSelectConversation: (conversationId: string) => void;
+  isStreaming?: boolean;
 }) {
-  const isStreaming = status === "streaming";
+  const isStreaming = isStreamingProp ?? status === "streaming";
 
   return (
     <header className="flex items-center justify-between gap-4 py-2">
-      <SeedPopover />
+      <SeedPopover
+        isAuthenticated={isAuthenticated}
+        currentConversationId={currentConversationId}
+        onSelectConversation={onSelectConversation}
+        isStreaming={isStreaming}
+      />
       <div className="flex items-center gap-2">
         <AuthControls disabled={isStreaming} />
         <Button
