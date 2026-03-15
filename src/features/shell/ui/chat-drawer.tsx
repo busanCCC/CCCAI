@@ -50,9 +50,15 @@ export function ChatDrawer({
   onSelectConversation,
   isStreaming = false,
 }: ChatDrawerProps) {
-  const { conversations, isLoading, error, refresh } = useConversationHistory(
-    isAuthenticated,
-  );
+  const {
+    conversations,
+    isLoading,
+    isLoadingMore,
+    hasMore,
+    error,
+    refresh,
+    loadMore,
+  } = useConversationHistory(isAuthenticated);
 
   return (
     <div className="flex flex-wrap gap-2">
@@ -118,31 +124,52 @@ export function ChatDrawer({
                 아직 대화 기록이 없습니다.
               </p>
             ) : (
-              <ul className="space-y-0.5 pb-4">
-                {conversations.map((conv) => (
-                  <li key={conv.id}>
-                    <DrawerClose asChild>
-                      <button
-                        type="button"
-                        disabled={isStreaming}
-                        onClick={() => onSelectConversation(conv.id)}
-                        className={`w-full flex flex-col items-start gap-0.5 px-3 py-2.5 -mx-1 rounded-lg text-left transition-colors duration-150 hover:bg-accent active:bg-accent/80 disabled:opacity-50 disabled:pointer-events-none ${
-                          currentConversationId === conv.id
-                            ? "bg-accent/80"
-                            : ""
-                        }`}
-                      >
-                        <span className="text-sm font-medium truncate max-w-full">
-                          {conv.name || "이름 없는 대화"}
-                        </span>
-                        <span className="text-xs text-muted-foreground">
-                          {formatRelativeTime(conv.updated_at)}
-                        </span>
-                      </button>
-                    </DrawerClose>
-                  </li>
-                ))}
-              </ul>
+              <>
+                <ul className="space-y-0.5 pb-2">
+                  {conversations.map((conv) => (
+                    <li key={conv.id}>
+                      <DrawerClose asChild>
+                        <button
+                          type="button"
+                          disabled={isStreaming}
+                          onClick={() => onSelectConversation(conv.id)}
+                          className={`w-full flex flex-col items-start gap-0.5 px-3 py-2.5 -mx-1 rounded-lg text-left transition-colors duration-150 hover:bg-accent active:bg-accent/80 disabled:opacity-50 disabled:pointer-events-none ${
+                            currentConversationId === conv.id
+                              ? "bg-accent/80"
+                              : ""
+                          }`}
+                        >
+                          <span className="text-sm font-medium truncate max-w-full">
+                            {conv.name || "이름 없는 대화"}
+                          </span>
+                          <span className="text-xs text-muted-foreground">
+                            {formatRelativeTime(conv.updated_at * 1000)}
+                          </span>
+                        </button>
+                      </DrawerClose>
+                    </li>
+                  ))}
+                </ul>
+                {hasMore && (
+                  <div className="pb-4">
+                    <button
+                      type="button"
+                      onClick={() => void loadMore()}
+                      disabled={isLoadingMore}
+                      className="w-full flex items-center justify-center gap-2 py-2.5 rounded-lg text-sm font-medium text-muted-foreground hover:bg-accent hover:text-foreground disabled:opacity-50 transition-colors"
+                    >
+                      {isLoadingMore ? (
+                        <>
+                          <Loader2 className="w-4 h-4 animate-spin" />
+                          불러오는 중...
+                        </>
+                      ) : (
+                        "더 보기"
+                      )}
+                    </button>
+                  </div>
+                )}
+              </>
             )}
           </div>
         </DrawerContent>

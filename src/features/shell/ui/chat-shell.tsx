@@ -65,7 +65,14 @@ export function ChatShell() {
 
   const handleSend = useCallback(async () => {
     const trimmed = input.trim();
-    if (!trimmed || isDisabled) return;
+    if (!trimmed) return;
+
+    const {
+      conversationId: currentConversationId,
+      status: currentStatus,
+      userId: currentUserId,
+    } = useChatStore.getState();
+    if (currentStatus === "streaming" || !currentUserId) return;
 
     clearError();
     addUserMessage(trimmed);
@@ -74,8 +81,8 @@ export function ChatShell() {
 
     await streamChat({
       query: trimmed,
-      conversationId,
-      userId,
+      conversationId: currentConversationId,
+      userId: currentUserId,
       onChunk: (chunk) => appendAssistantChunk(assistantId, chunk),
       onConversationId: (nextId) => finalizeConversationId(nextId),
       onError: (message) => setError(message),
@@ -84,9 +91,6 @@ export function ChatShell() {
     });
   }, [
     input,
-    isDisabled,
-    conversationId,
-    userId,
     clearError,
     addUserMessage,
     startAssistantMessage,
