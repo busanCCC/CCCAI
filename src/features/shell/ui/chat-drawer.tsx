@@ -104,28 +104,28 @@ export function ChatDrawer({
               </Link>
             ))}
             <Separator className="w-full my-2" />
-            <div className="flex items-center gap-2 py-2 font-medium text-sm">
+            <div className="flex items-center gap-2 px-2 py-2 font-medium text-sm">
               <MessageSquare className="w-4 h-4 shrink-0" />
               채팅 목록
             </div>
             {!isAuthenticated ? (
-              <p className="text-xs text-muted-foreground py-2">
+              <p className="text-xs text-muted-foreground px-2 py-2">
                 로그인하면 채팅 기록을 불러올 수 있습니다.
               </p>
             ) : isLoading ? (
-              <div className="flex items-center gap-2 py-3 text-muted-foreground">
+              <div className="flex items-center gap-2 px-2 py-3 text-muted-foreground">
                 <Loader2 className="w-4 h-4 animate-spin" />
                 <span className="text-sm">불러오는 중...</span>
               </div>
             ) : error ? (
-              <p className="text-xs text-destructive py-2">{error}</p>
+              <p className="text-xs text-destructive px-2 py-2">{error}</p>
             ) : conversations.length === 0 ? (
-              <p className="text-xs text-muted-foreground py-2">
+              <p className="text-xs text-muted-foreground px-2 py-2">
                 아직 대화 기록이 없습니다.
               </p>
             ) : (
               <>
-                <ul className="space-y-0.5 pb-2">
+                <ul className="space-y-0.5 px-2 pb-2">
                   {conversations.map((conv) => (
                     <li key={conv.id}>
                       <DrawerClose asChild>
@@ -151,7 +151,7 @@ export function ChatDrawer({
                   ))}
                 </ul>
                 {hasMore && (
-                  <div className="pb-4">
+                  <div className="px-2 pb-4">
                     <button
                       type="button"
                       onClick={() => void loadMore()}
