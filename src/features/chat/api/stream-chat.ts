@@ -70,14 +70,7 @@ export async function streamChat({
     const reader = response.body.getReader();
     const decoder = new TextDecoder();
 
-    while (true) {
-      const { done, value } = await reader.read();
-      if (done) break;
-      if (!value) continue;
-      lastActivity = Date.now();
-      const chunkText = decoder.decode(value, { stream: true });
-      const events = parser(chunkText);
-
+    const processEvents = (events: string[]) => {
       for (const data of events) {
         let payload: Record<string, unknown> | null = null;
         try {
@@ -90,6 +83,8 @@ export async function streamChat({
         if (event === "message") {
           const answer = typeof payload.answer === "string" ? payload.answer : "";
           if (answer) onChunk(answer);
+          const convId = typeof payload.conversation_id === "string" ? payload.conversation_id : "";
+          if (convId) onConversationId(convId);
         }
         if (event === "message_end") {
           const nextId = typeof payload.conversation_id === "string" ? payload.conversation_id : "";
@@ -122,7 +117,20 @@ export async function streamChat({
           return;
         }
       }
+    };
+
+    while (true) {
+      const { done, value } = await reader.read();
+      if (done) break;
+      if (!value) continue;
+      lastActivity = Date.now();
+      const chunkText = decoder.decode(value, { stream: true });
+      processEvents(parser(chunkText));
     }
+
+    const remaining = decoder.decode();
+    if (remaining) processEvents(parser(remaining));
+    processEvents(parser("\n\n"));
   } catch (error) {
     if (controller.signal.aborted) {
       didError = true;

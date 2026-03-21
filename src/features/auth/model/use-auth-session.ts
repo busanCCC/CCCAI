@@ -1,58 +1,95 @@
 "use client";
 
-import type { User } from "@supabase/supabase-js";
 import { useEffect, useState } from "react";
-import type { AuthChangeEvent, Session } from "@supabase/supabase-js";
-
-import { createSupabaseBrowserClientOrNull } from "@/lib/supabase/client";
 
 type AuthSessionState = {
-  user: User | null;
+  user: AuthUser | null;
   isLoading: boolean;
   isAuthenticated: boolean;
   signOut: () => Promise<void>;
 };
 
+type AuthUser = {
+  id: string;
+  email: string | null;
+};
+
+type AuthSessionResponse = {
+  isAuthenticated: boolean;
+  user: AuthUser | null;
+  error?: string;
+};
+
+async function fetchSession(): Promise<AuthSessionResponse> {
+  const response = await fetch("/api/auth/session", {
+    method: "GET",
+    cache: "no-store",
+  });
+
+  if (!response.ok) {
+    throw new Error("세션 정보를 불러오지 못했습니다.");
+  }
+
+  return (await response.json()) as AuthSessionResponse;
+}
+
 export function useAuthSession(): AuthSessionState {
-  const supabase = createSupabaseBrowserClientOrNull();
-  const [user, setUser] = useState<User | null>(null);
-  const [isLoading, setIsLoading] = useState(Boolean(supabase));
+  const [user, setUser] = useState<AuthUser | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    if (!supabase) {
-      return;
-    }
     let isMounted = true;
 
     const loadUser = async () => {
-      const result = await supabase.auth.getUser();
-      if (!isMounted) return;
-      setUser(result.data.user ?? null);
-      setIsLoading(false);
+      try {
+        const result = await fetchSession();
+        if (!isMounted) return;
+        setUser(result.isAuthenticated ? result.user : null);
+      } catch {
+        if (!isMounted) return;
+        setUser(null);
+      } finally {
+        if (!isMounted) return;
+        setIsLoading(false);
+      }
     };
+
     void loadUser();
 
-    const {
-      data: { subscription },
-    } = supabase.auth.onAuthStateChange((_event: AuthChangeEvent, session: Session | null) => {
-      setUser(session?.user ?? null);
-      setIsLoading(false);
-    });
+    const onFocus = () => {
+      void loadUser();
+    };
+    const onVisibilityChange = () => {
+      if (document.visibilityState === "visible") {
+        void loadUser();
+      }
+    };
+
+    window.addEventListener("focus", onFocus);
+    document.addEventListener("visibilitychange", onVisibilityChange);
 
     return () => {
       isMounted = false;
-      subscription.unsubscribe();
+      window.removeEventListener("focus", onFocus);
+      document.removeEventListener("visibilitychange", onVisibilityChange);
     };
-  }, [supabase]);
+  }, []);
 
   const signOut = async () => {
-    if (!supabase) {
-      return;
+    const response = await fetch("/api/auth/sign-out", {
+      method: "POST",
+      cache: "no-store",
+    });
+
+    if (!response.ok) {
+      const result = (await response.json().catch(() => null)) as
+        | { error?: string }
+        | null;
+      throw new Error(result?.error || "로그아웃 중 오류가 발생했습니다.");
     }
-    const { error } = await supabase.auth.signOut();
-    if (error) {
-      throw error;
-    }
+
+    setUser(null);
+    setIsLoading(false);
   };
 
   return {

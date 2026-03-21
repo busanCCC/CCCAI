@@ -5,6 +5,7 @@ import { toast } from "sonner";
 
 import { Button } from "@/components/ui/button";
 import { useAuthSession } from "@/features/auth/model/use-auth-session";
+import { useChatStore } from "@/features/chat/model/store";
 
 type AuthControlsProps = {
   disabled?: boolean;
@@ -23,7 +24,9 @@ export function AuthControls({ disabled }: AuthControlsProps) {
   const handleSignOut = async () => {
     try {
       await signOut();
+      useChatStore.getState().resetSession();
       toast.success("로그아웃되었습니다.");
+      router.push("/");
       router.refresh();
     } catch (error) {
       const message = error instanceof Error ? error.message : "로그아웃 중 오류가 발생했습니다.";

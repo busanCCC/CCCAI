@@ -5,6 +5,10 @@ import { ChatThread } from "@/features/chat/ui/chat-thread";
 import { streamChat } from "@/features/chat/api/stream-chat";
 import { useChatStore } from "@/features/chat/model/store";
 import { useAuthSession } from "@/features/auth/model/use-auth-session";
+import {
+  fetchMessages,
+  difyMessagesToConversationMessages,
+} from "@/features/history/api/fetch-messages";
 import { Spinner } from "@/components/ui/spinner";
 import { ChatHeader } from "@/features/shell/ui/chat-header";
 import { useCallback, useEffect, useState } from "react";
@@ -28,6 +32,7 @@ export function ChatShell() {
     clearError,
     setProcessingStatus,
     setUserId,
+    loadConversation,
   } = useChatStore();
   const { user, isLoading: isAuthLoading } = useAuthSession();
 
@@ -60,7 +65,14 @@ export function ChatShell() {
 
   const handleSend = useCallback(async () => {
     const trimmed = input.trim();
-    if (!trimmed || isDisabled) return;
+    if (!trimmed) return;
+
+    const {
+      conversationId: currentConversationId,
+      status: currentStatus,
+      userId: currentUserId,
+    } = useChatStore.getState();
+    if (currentStatus === "streaming" || !currentUserId) return;
 
     clearError();
     addUserMessage(trimmed);
@@ -69,8 +81,8 @@ export function ChatShell() {
 
     await streamChat({
       query: trimmed,
-      conversationId,
-      userId,
+      conversationId: currentConversationId,
+      userId: currentUserId,
       onChunk: (chunk) => appendAssistantChunk(assistantId, chunk),
       onConversationId: (nextId) => finalizeConversationId(nextId),
       onError: (message) => setError(message),
@@ -79,9 +91,6 @@ export function ChatShell() {
     });
   }, [
     input,
-    isDisabled,
-    conversationId,
-    userId,
     clearError,
     addUserMessage,
     startAssistantMessage,
@@ -96,6 +105,23 @@ export function ChatShell() {
     setInput("");
     setSuggestionKey((prev) => prev + 1);
   }, [startNewConversation]);
+
+  const handleSelectConversation = useCallback(
+    async (selectedConversationId: string) => {
+      if (status === "streaming") return;
+      try {
+        const res = await fetchMessages(selectedConversationId, { limit: 100 });
+        const chatMessages = difyMessagesToConversationMessages(res.data ?? []);
+        loadConversation(selectedConversationId, chatMessages);
+        setSuggestionKey((prev) => prev + 1);
+      } catch (e) {
+        const message =
+          e instanceof Error ? e.message : "대화를 불러오지 못했습니다.";
+        toast.error(message);
+      }
+    },
+    [status, loadConversation],
+  );
 
   if (isAuthLoading) {
     return (
@@ -129,7 +155,14 @@ export function ChatShell() {
         {/* Header Area */}
         <div className="flex-none px-4 py-4 md:px-0 md:py-6">
           <div className="mx-auto max-w-[600px]">
-            <ChatHeader status={status} onNewConversation={handleNewConversation} />
+            <ChatHeader
+              status={status}
+              onNewConversation={handleNewConversation}
+              isAuthenticated={Boolean(user)}
+              currentConversationId={conversationId}
+              onSelectConversation={handleSelectConversation}
+              isStreaming={isStreaming}
+            />
           </div>
         </div>
 

@@ -28,6 +28,8 @@ type ChatState = {
   clearError: () => void;
   setProcessingStatus: (status: string | null) => void;
   setUserId: (userId: string) => void;
+  resetSession: () => void;
+  loadConversation: (conversationId: string, messages: ChatMessage[]) => void;
 };
 
 export const useChatStore = create<ChatState>((set) => ({
@@ -126,5 +128,31 @@ export const useChatStore = create<ChatState>((set) => ({
     if (!userId) return;
     writeStorage(STORAGE_KEYS.userId, userId);
     set({ userId });
+  },
+  resetSession: () => {
+    removeStorage(STORAGE_KEYS.conversationId);
+    removeStorage(STORAGE_KEYS.userId);
+    const newUserId = createUserId();
+    writeStorage(STORAGE_KEYS.userId, newUserId);
+    set({
+      messages: [],
+      conversationId: null,
+      userId: newUserId,
+      status: "idle",
+      errorMessage: null,
+      processingStatus: null,
+    });
+  },
+  loadConversation: (conversationId, messages) => {
+    if (conversationId) {
+      writeStorage(STORAGE_KEYS.conversationId, conversationId);
+    }
+    set({
+      conversationId: conversationId || null,
+      messages,
+      status: "idle",
+      errorMessage: null,
+      processingStatus: null,
+    });
   },
 }));

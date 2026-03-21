@@ -9,7 +9,6 @@ import { toast } from "sonner";
 
 import { Button } from "@/components/ui/button";
 import { useAuthSession } from "@/features/auth/model/use-auth-session";
-import { createSupabaseBrowserClientOrNull } from "@/lib/supabase/client";
 import { cn } from "@/lib/utils";
 
 const PROVIDERS: Array<{
@@ -45,21 +44,8 @@ export function LoginPanel() {
   const handleSignIn = async (provider: Provider) => {
     setLoadingProvider(provider);
     try {
-      const supabase = createSupabaseBrowserClientOrNull();
-      if (!supabase) {
-        throw new Error("Supabase 환경 변수가 설정되지 않았습니다.");
-      }
-      const redirectTo = `${window.location.origin}/auth/callback?next=${encodeURIComponent(next)}`;
-      const { error } = await supabase.auth.signInWithOAuth({
-        provider,
-        options: {
-          redirectTo,
-        },
-      });
-
-      if (error) {
-        throw error;
-      }
+      const signInPath = `/api/auth/sign-in?provider=${encodeURIComponent(provider)}&next=${encodeURIComponent(next)}`;
+      window.location.assign(signInPath);
     } catch (error) {
       const message =
         error instanceof Error ? error.message : "로그인 요청 중 오류가 발생했습니다.";

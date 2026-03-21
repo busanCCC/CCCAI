@@ -3,6 +3,10 @@ import type { Metadata } from "next";
 import { Analytics } from "@vercel/analytics/next";
 import { Toaster } from "sonner";
 import "./globals.css";
+import { Geist } from "next/font/google";
+import { cn } from "@/lib/utils";
+
+const geist = Geist({subsets:['latin'],variable:'--font-sans'});
 
 export const metadata: Metadata = {
   title: "씨앗 순장님과 대화하기",
@@ -26,7 +30,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="ko" suppressHydrationWarning>
+    <html lang="ko" suppressHydrationWarning className={cn("font-sans", geist.variable)}>
       <body className="min-h-screen bg-background font-sans text-foreground antialiased">
         {children}
         <Toaster />
