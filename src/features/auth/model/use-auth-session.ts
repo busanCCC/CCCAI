@@ -2,6 +2,8 @@
 
 import { useEffect, useState } from "react";
 
+const AUTH_SESSION_EVENT = "auth-session-changed";
+
 type AuthSessionState = {
   user: AuthUser | null;
   isLoading: boolean;
@@ -19,6 +21,17 @@ type AuthSessionResponse = {
   user: AuthUser | null;
   error?: string;
 };
+
+type AuthSessionEventDetail = {
+  user: AuthUser | null;
+};
+
+function emitAuthSessionChanged(detail: AuthSessionEventDetail) {
+  if (typeof window === "undefined") return;
+  window.dispatchEvent(
+    new CustomEvent<AuthSessionEventDetail>(AUTH_SESSION_EVENT, { detail }),
+  );
+}
 
 async function fetchSession(): Promise<AuthSessionResponse> {
   const response = await fetch("/api/auth/session", {
@@ -64,14 +77,24 @@ export function useAuthSession(): AuthSessionState {
         void loadUser();
       }
     };
+    const onAuthSessionChanged = (event: Event) => {
+      const customEvent = event as CustomEvent<AuthSessionEventDetail>;
+      setUser(customEvent.detail?.user ?? null);
+      setIsLoading(false);
+    };
 
     window.addEventListener("focus", onFocus);
     document.addEventListener("visibilitychange", onVisibilityChange);
+    window.addEventListener(AUTH_SESSION_EVENT, onAuthSessionChanged as EventListener);
 
     return () => {
       isMounted = false;
       window.removeEventListener("focus", onFocus);
       document.removeEventListener("visibilitychange", onVisibilityChange);
+      window.removeEventListener(
+        AUTH_SESSION_EVENT,
+        onAuthSessionChanged as EventListener,
+      );
     };
   }, []);
 
@@ -90,6 +113,7 @@ export function useAuthSession(): AuthSessionState {
 
     setUser(null);
     setIsLoading(false);
+    emitAuthSessionChanged({ user: null });
   };
 
   return {

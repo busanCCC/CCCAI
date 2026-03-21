@@ -26,26 +26,8 @@ body:
       required: true
 
   - type: textarea
-    id: implementation
+    id: etc
     attributes:
-      label: Implementation
-      description: 예상 구현 방식
-      placeholder: |
-        - middleware에서 토큰 검증
-        - refresh token 로직 추가
-
-  - type: textarea
-    id: todo
-    attributes:
-      label: Todo
-      placeholder: |
-        - [ ] API 수정
-        - [ ] 테스트 작성
-        - [ ] 문서 업데이트
-
-  - type: textarea
-    id: reference
-    attributes:
-      label: Reference
-      description: 참고 링크
-      placeholder: 관련 PR / 문서 / 디자인
+      label: etc
+      description: 기타사항
+      placeholder: 기타사항

@@ -39,11 +39,6 @@ export default async function OnboardingPage() {
 
   return (
     <main className="relative min-h-dvh w-full overflow-hidden bg-background text-foreground">
-      <div className="pointer-events-none absolute inset-0 z-0 overflow-hidden bg-linear-to-br from-amber-50/60 via-white to-cyan-50/40">
-        <div className="absolute top-0 left-0 h-[520px] w-[520px] rounded-full bg-yellow-200/30 mix-blend-multiply blur-[120px]" />
-        <div className="absolute bottom-0 right-0 h-[460px] w-[460px] rounded-full bg-sky-200/25 mix-blend-multiply blur-[120px]" />
-      </div>
-
       <div className="relative z-10 mx-auto flex min-h-dvh w-full max-w-3xl">
         <OnboardingWizard initialProfile={snapshot} />
       </div>

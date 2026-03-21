@@ -8,12 +8,10 @@ export function ChatThread({
   messages,
   status,
   processingStatus,
-  onSuggestionClick,
 }: {
   messages: ChatMessage[];
   status: ChatStatus;
   processingStatus: string | null;
-  onSuggestionClick: (question: string) => void;
 }) {
   const bottomRef = useRef<HTMLDivElement | null>(null);
 
@@ -33,7 +31,7 @@ export function ChatThread({
       <div className="mx-auto min-h-full max-w-[600px] px-4 py-8 md:px-0 text-center relative">
         {messages.length === 0 && (
           <div className="absolute inset-0 z-0 flex items-center justify-center px-4">
-            <EmptyState onSuggestionClick={onSuggestionClick} />
+            <EmptyState />
           </div>
         )}
 

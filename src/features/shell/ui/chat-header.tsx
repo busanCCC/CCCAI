@@ -9,6 +9,7 @@ export function ChatHeader({
   status,
   onNewConversation,
   isAuthenticated,
+  authUserId,
   currentConversationId,
   onSelectConversation,
   isStreaming: isStreamingProp,
@@ -16,6 +17,7 @@ export function ChatHeader({
   status: ChatStatus;
   onNewConversation: () => void;
   isAuthenticated: boolean;
+  authUserId: string | null;
   currentConversationId: string | null;
   onSelectConversation: (conversationId: string) => void;
   isStreaming?: boolean;
@@ -26,9 +28,9 @@ export function ChatHeader({
     <header className="flex items-center justify-between gap-4 py-2">
       <SeedPopover
         isAuthenticated={isAuthenticated}
+        authUserId={authUserId}
         currentConversationId={currentConversationId}
         onSelectConversation={onSelectConversation}
-        isStreaming={isStreaming}
       />
       <div className="flex items-center gap-2">
         <AuthControls disabled={isStreaming} />
@@ -37,7 +39,6 @@ export function ChatHeader({
           variant="outline"
           size="sm"
           onClick={onNewConversation}
-          disabled={isStreaming}
           aria-label="새 대화 시작"
           className="rounded-full"
         >

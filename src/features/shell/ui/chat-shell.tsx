@@ -1,17 +1,23 @@
 "use client";
 
+import { useQueryClient } from "@tanstack/react-query";
 import { ChatInput } from "@/features/chat/ui/chat-input";
 import { ChatThread } from "@/features/chat/ui/chat-thread";
 import { streamChat } from "@/features/chat/api/stream-chat";
+import { EXAMPLE_QUESTIONS } from "@/features/chat/model/data";
 import { useChatStore } from "@/features/chat/model/store";
 import { useAuthSession } from "@/features/auth/model/use-auth-session";
 import {
   fetchMessages,
   difyMessagesToConversationMessages,
 } from "@/features/history/api/fetch-messages";
+import {
+  HISTORY_QUERY_STALE_TIME,
+  historyQueryKeys,
+} from "@/features/history/model/query-keys";
 import { Spinner } from "@/components/ui/spinner";
 import { ChatHeader } from "@/features/shell/ui/chat-header";
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
 
 export function ChatShell() {
@@ -35,9 +41,12 @@ export function ChatShell() {
     loadConversation,
   } = useChatStore();
   const { user, isLoading: isAuthLoading } = useAuthSession();
+  const queryClient = useQueryClient();
 
   const [input, setInput] = useState("");
   const [suggestionKey, setSuggestionKey] = useState(0);
+  const authUserId = user?.id ?? null;
+  const activeStreamControllerRef = useRef<AbortController | null>(null);
 
   useEffect(() => {
     initFromStorage();
@@ -62,6 +71,38 @@ export function ChatShell() {
   const isStreaming = status === "streaming";
   const isReady = Boolean(userId);
   const isDisabled = isStreaming || !isReady;
+  const inputSuggestions = messages.length === 0 ? EXAMPLE_QUESTIONS.slice(0, 2) : [];
+
+  const invalidateHistoryQueries = useCallback(
+    (targetConversationId?: string | null) => {
+      void queryClient.invalidateQueries({
+        queryKey: historyQueryKeys.conversations(authUserId),
+      });
+      if (targetConversationId) {
+        void queryClient.invalidateQueries({
+          queryKey: historyQueryKeys.messages(authUserId, targetConversationId),
+        });
+      }
+    },
+    [queryClient, authUserId],
+  );
+
+  const stopActiveStream = useCallback(() => {
+    const activeController = activeStreamControllerRef.current;
+    if (!activeController) return;
+
+    activeStreamControllerRef.current = null;
+    activeController.abort();
+    finalizeConversationId();
+    invalidateHistoryQueries(useChatStore.getState().conversationId);
+  }, [finalizeConversationId, invalidateHistoryQueries]);
+
+  useEffect(() => {
+    return () => {
+      activeStreamControllerRef.current?.abort();
+      activeStreamControllerRef.current = null;
+    };
+  }, []);
 
   const handleSend = useCallback(async () => {
     const trimmed = input.trim();
@@ -78,17 +119,29 @@ export function ChatShell() {
     addUserMessage(trimmed);
     const assistantId = startAssistantMessage();
     setInput("");
+    const streamController = new AbortController();
+    activeStreamControllerRef.current = streamController;
 
-    await streamChat({
-      query: trimmed,
-      conversationId: currentConversationId,
-      userId: currentUserId,
-      onChunk: (chunk) => appendAssistantChunk(assistantId, chunk),
-      onConversationId: (nextId) => finalizeConversationId(nextId),
-      onError: (message) => setError(message),
-      onDone: () => finalizeConversationId(),
-      onNodeStart: (status) => setProcessingStatus(status),
-    });
+    try {
+      await streamChat({
+        query: trimmed,
+        conversationId: currentConversationId,
+        userId: currentUserId,
+        signal: streamController.signal,
+        onChunk: (chunk) => appendAssistantChunk(assistantId, chunk),
+        onConversationId: (nextId) => finalizeConversationId(nextId),
+        onError: (message) => setError(message),
+        onDone: () => {
+          finalizeConversationId();
+          invalidateHistoryQueries(useChatStore.getState().conversationId);
+        },
+        onNodeStart: (status) => setProcessingStatus(status),
+      });
+    } finally {
+      if (activeStreamControllerRef.current === streamController) {
+        activeStreamControllerRef.current = null;
+      }
+    }
   }, [
     input,
     clearError,
@@ -96,21 +149,27 @@ export function ChatShell() {
     startAssistantMessage,
     appendAssistantChunk,
     finalizeConversationId,
+    invalidateHistoryQueries,
     setError,
     setProcessingStatus,
   ]);
 
   const handleNewConversation = useCallback(() => {
+    stopActiveStream();
     startNewConversation();
     setInput("");
     setSuggestionKey((prev) => prev + 1);
-  }, [startNewConversation]);
+  }, [stopActiveStream, startNewConversation]);
 
   const handleSelectConversation = useCallback(
     async (selectedConversationId: string) => {
-      if (status === "streaming") return;
+      stopActiveStream();
       try {
-        const res = await fetchMessages(selectedConversationId, { limit: 100 });
+        const res = await queryClient.fetchQuery({
+          queryKey: historyQueryKeys.messages(authUserId, selectedConversationId),
+          queryFn: () => fetchMessages(selectedConversationId, { limit: 100 }),
+          staleTime: HISTORY_QUERY_STALE_TIME,
+        });
         const chatMessages = difyMessagesToConversationMessages(res.data ?? []);
         loadConversation(selectedConversationId, chatMessages);
         setSuggestionKey((prev) => prev + 1);
@@ -120,17 +179,12 @@ export function ChatShell() {
         toast.error(message);
       }
     },
-    [status, loadConversation],
+    [stopActiveStream, queryClient, authUserId, loadConversation],
   );
 
   if (isAuthLoading) {
     return (
       <main className="fixed inset-0 flex h-dvh w-full flex-col overflow-hidden bg-background text-foreground">
-        <div className="absolute inset-0 z-0 overflow-hidden bg-linear-to-br from-indigo-50/50 via-white to-yellow-50/50 pointer-events-none">
-          <div className="absolute top-0 left-0 h-[500px] w-[500px] rounded-full bg-primary/20 mix-blend-multiply blur-[120px]" />
-          <div className="absolute bottom-0 right-0 h-[420px] w-[420px] rounded-full bg-blue-300/20 mix-blend-multiply blur-[120px]" />
-        </div>
-
         <div className="relative z-10 flex h-full w-full items-center justify-center">
           <div className="flex flex-col items-center gap-3">
             <Spinner className="size-8 text-foreground/80" />
@@ -143,14 +197,6 @@ export function ChatShell() {
 
   return (
     <main className="fixed inset-0 flex h-dvh w-full flex-col overflow-hidden bg-background text-foreground supports-[height:100cqh]:h-[100cqh] supports-[height:100svh]:h-[100svh]">
-      {/* 오로라 배경 */}
-      <div className="absolute inset-0 z-0 overflow-hidden bg-linear-to-br from-indigo-50/50 via-white to-yellow-50/50 pointer-events-none">
-        <div className="absolute -top-1/2 -left-1/2 h-[200%] w-[200%] animate-[aurora_60s_linear_infinite] opacity-60 bg-[conic-gradient(from_0deg,transparent_0_340deg,white_360deg)] mix-blend-overlay filter blur-[100px] will-change-transform" />
-        <div className="absolute top-0 left-0 h-[600px] w-[600px] rounded-full bg-primary/20 mix-blend-multiply filter blur-[120px] animate-[float_20s_ease-in-out_infinite] will-change-transform" />
-        <div className="absolute bottom-0 right-0 h-[500px] w-[500px] rounded-full bg-blue-300/20 mix-blend-multiply filter blur-[120px] animate-[float-delayed_25s_ease-in-out_infinite] will-change-transform" />
-        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 h-[800px] w-[800px] rounded-full bg-yellow-200/10 mix-blend-overlay filter blur-[100px] will-change-transform" />
-      </div>
-
       <div className="relative z-10 flex h-full w-full flex-col">
         {/* Header Area */}
         <div className="flex-none px-4 py-4 md:px-0 md:py-6">
@@ -159,6 +205,7 @@ export function ChatShell() {
               status={status}
               onNewConversation={handleNewConversation}
               isAuthenticated={Boolean(user)}
+              authUserId={authUserId}
               currentConversationId={conversationId}
               onSelectConversation={handleSelectConversation}
               isStreaming={isStreaming}
@@ -173,13 +220,26 @@ export function ChatShell() {
             messages={messages}
             status={status}
             processingStatus={processingStatus}
-            onSuggestionClick={setInput}
           />
         </div>
 
         {/* Input Area (Fixed at bottom of flex container) */}
-        <div className="flex-none w-full px-4 pb-4 pt-2 md:px-0 md:pb-6 bg-linear-to-t from-white/80 to-transparent backdrop-blur-[1px]">
+        <div className="flex-none w-full bg-background px-4 pt-2 pb-4 md:px-0 md:pb-6">
           <div className="mx-auto w-full max-w-[600px] space-y-2">
+            {inputSuggestions.length > 0 && (
+              <div className="grid grid-cols-2 gap-2">
+                {inputSuggestions.map((question) => (
+                  <button
+                    key={question}
+                    type="button"
+                    onClick={() => setInput(question)}
+                    className="rounded-2xl border border-border/35 bg-background px-3 py-2 text-left text-xs leading-snug font-medium text-foreground/65 hover:bg-accent/20 hover:text-foreground/85 sm:text-sm"
+                  >
+                    {question}
+                  </button>
+                ))}
+              </div>
+            )}
             <ChatInput
               value={input}
               onChange={setInput}

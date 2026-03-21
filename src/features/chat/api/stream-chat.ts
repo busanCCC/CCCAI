@@ -8,6 +8,7 @@ export type ChatStreamHandlers = {
   onError: (message: string) => void;
   onDone?: () => void;
   onNodeStart?: (status: string) => void;
+  onAbort?: () => void;
 };
 
 type ChatStreamParams = {
@@ -15,6 +16,7 @@ type ChatStreamParams = {
   conversationId?: string | null;
   userId: string;
   timeoutMs?: number;
+  signal?: AbortSignal;
 } & ChatStreamHandlers;
 
 export async function streamChat({
@@ -22,19 +24,38 @@ export async function streamChat({
   conversationId,
   userId,
   timeoutMs = 60000,
+  signal,
   onChunk,
   onConversationId,
   onError,
   onDone,
   onNodeStart,
+  onAbort,
 }: ChatStreamParams) {
   const controller = new AbortController();
   const parser = createSseParser();
   let lastActivity = Date.now();
   let didError = false;
+  let wasAborted = false;
+  let abortReason: "manual" | "timeout" | null = null;
+  const abortWithReason = (reason: "manual" | "timeout") => {
+    if (controller.signal.aborted) return;
+    abortReason = reason;
+    controller.abort();
+  };
+
+  const handleExternalAbort = () => abortWithReason("manual");
+  if (signal) {
+    if (signal.aborted) {
+      abortWithReason("manual");
+    } else {
+      signal.addEventListener("abort", handleExternalAbort);
+    }
+  }
+
   const timeout = setInterval(() => {
     if (Date.now() - lastActivity > timeoutMs) {
-      controller.abort();
+      abortWithReason("timeout");
     }
   }, 1000);
 
@@ -133,6 +154,11 @@ export async function streamChat({
     processEvents(parser("\n\n"));
   } catch (error) {
     if (controller.signal.aborted) {
+      if (abortReason === "manual") {
+        wasAborted = true;
+        onAbort?.();
+        return;
+      }
       didError = true;
       onError("응답이 지연되어 연결이 종료되었습니다. 다시 시도해주세요.");
       return;
@@ -146,6 +172,9 @@ export async function streamChat({
     onError("알 수 없는 오류가 발생했습니다.");
   } finally {
     clearInterval(timeout);
-    if (!didError) onDone?.();
+    if (signal) {
+      signal.removeEventListener("abort", handleExternalAbort);
+    }
+    if (!didError && !wasAborted) onDone?.();
   }
 }

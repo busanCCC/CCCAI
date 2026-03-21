@@ -3,6 +3,7 @@ import { NextResponse } from "next/server";
 
 import { isProfileComplete } from "@/features/profile/model/completion";
 import { toProfileSnapshot } from "@/features/profile/model/types";
+import { getAppUrl } from "@/lib/app-url";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 
 function pickString(value: unknown): string | null {
@@ -10,20 +11,21 @@ function pickString(value: unknown): string | null {
 }
 
 export async function GET(request: NextRequest) {
+  const appUrl = getAppUrl(request);
   const requestUrl = new URL(request.url);
   const code = requestUrl.searchParams.get("code");
   const next = requestUrl.searchParams.get("next") || "/";
   const safeNext = next.startsWith("/") ? next : "/";
 
   if (!code) {
-    return NextResponse.redirect(new URL("/auth/error", request.url));
+    return NextResponse.redirect(new URL("/auth/error", appUrl));
   }
 
   try {
     const supabase = await createSupabaseServerClient();
     const { error } = await supabase.auth.exchangeCodeForSession(code);
     if (error) {
-      return NextResponse.redirect(new URL("/auth/error", request.url));
+      return NextResponse.redirect(new URL("/auth/error", appUrl));
     }
 
     // NOTE: 로그인 직후 서비스용 profiles 행을 생성/갱신한다.
@@ -56,8 +58,8 @@ export async function GET(request: NextRequest) {
       }
     }
 
-    return NextResponse.redirect(new URL(shouldOnboard ? "/onboarding" : safeNext, request.url));
+    return NextResponse.redirect(new URL(shouldOnboard ? "/onboarding" : safeNext, appUrl));
   } catch {
-    return NextResponse.redirect(new URL("/auth/error", request.url));
+    return NextResponse.redirect(new URL("/auth/error", appUrl));
   }
 }

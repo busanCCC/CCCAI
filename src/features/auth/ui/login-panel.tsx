@@ -60,22 +60,14 @@ export function LoginPanel() {
 
   return (
     <div className="flex min-h-[calc(100dvh-2.5rem)] flex-col py-8 sm:min-h-[calc(100dvh-8rem)] sm:py-10">
-      <div className="mt-[11dvh] flex flex-col items-center gap-4 text-center sm:mt-[14dvh] md:gap-5">
+      <div className="mt-[11dvh] flex flex-col items-center text-center sm:mt-[14dvh]">
         <Image
-          src="/img/씨앗ai.png"
-          alt="씨앗 순장 로고"
-          width={200}
-          height={200}
-          className="h-28 w-28 rounded-full sm:h-36 sm:w-36"
+          src="/img/logo.png"
+          alt="씨앗 순장"
+          width={449}
+          height={257}
+          className="h-auto w-full max-w-[240px] object-contain sm:max-w-[300px]"
         />
-        <div className="space-y-2 md:space-y-3">
-          <h1 className="text-3xl font-bold tracking-tight text-foreground">씨앗 순장 로그인</h1>
-          {/* <p className="text-sm text-muted-foreground md:text-lg">
-            순모임 · 캠퍼스 · 고민
-            <br className="hidden md:block" />
-            무엇이든 편하게 물어볼 수 있어요.
-          </p> */}
-        </div>
       </div>
 
       <div className="mt-auto flex flex-col gap-3 pb-2 sm:pb-10">

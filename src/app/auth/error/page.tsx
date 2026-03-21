@@ -6,11 +6,6 @@ import { Button } from "@/components/ui/button";
 export default function AuthErrorPage() {
   return (
     <main className="relative min-h-dvh w-full overflow-hidden bg-background text-foreground">
-      <div className="pointer-events-none absolute inset-0 z-0 overflow-hidden bg-linear-to-br from-indigo-50/50 via-white to-yellow-50/50">
-        <div className="absolute top-0 left-0 h-[500px] w-[500px] rounded-full bg-primary/20 mix-blend-multiply blur-[120px]" />
-        <div className="absolute bottom-0 right-0 h-[420px] w-[420px] rounded-full bg-blue-300/20 mix-blend-multiply blur-[120px]" />
-      </div>
-
       <div className="relative z-10 mx-auto flex min-h-[calc(100dvh-2.5rem)] w-full max-w-md flex-col px-4 py-8 sm:min-h-[calc(100dvh-8rem)] sm:py-10">
         <div className="mt-[12dvh] flex flex-col items-center gap-4 text-center sm:mt-[16dvh]">
           <Image

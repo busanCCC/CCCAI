@@ -1,10 +1,18 @@
 "use client";
 // NOTE: 대화 목록 상태 및 새로고침/페이지네이션 훅
-import { useCallback, useEffect, useState } from "react";
+import { useInfiniteQuery } from "@tanstack/react-query";
+import { useCallback } from "react";
+
 import { fetchConversations } from "@/features/history/api/fetch-conversations";
+import { HISTORY_QUERY_STALE_TIME, historyQueryKeys } from "@/features/history/model/query-keys";
 import type { DifyConversation } from "@/features/history/model/types";
 
 const PAGE_SIZE = 10;
+
+type UseConversationHistoryOptions = {
+  enabled: boolean;
+  userId: string | null;
+};
 
 type UseConversationHistoryResult = {
   conversations: DifyConversation[];
@@ -16,64 +24,52 @@ type UseConversationHistoryResult = {
   loadMore: () => Promise<void>;
 };
 
-export function useConversationHistory(
-  isAuthenticated: boolean,
-): UseConversationHistoryResult {
-  const [conversations, setConversations] = useState<DifyConversation[]>([]);
-  const [hasMore, setHasMore] = useState(false);
-  const [isLoading, setIsLoading] = useState(false);
-  const [isLoadingMore, setIsLoadingMore] = useState(false);
-  const [error, setError] = useState<string | null>(null);
+export function useConversationHistory({
+  enabled,
+  userId,
+}: UseConversationHistoryOptions): UseConversationHistoryResult {
+  const isAuthenticated = Boolean(userId);
+
+  const query = useInfiniteQuery({
+    queryKey: historyQueryKeys.conversations(userId),
+    queryFn: ({ pageParam }) =>
+      fetchConversations({
+        last_id: pageParam,
+        limit: PAGE_SIZE,
+        sort_by: "-updated_at",
+      }),
+    initialPageParam: undefined as string | undefined,
+    getNextPageParam: (lastPage) => {
+      if (!lastPage.has_more) return undefined;
+      return lastPage.data[lastPage.data.length - 1]?.id;
+    },
+    enabled: enabled && isAuthenticated,
+    staleTime: HISTORY_QUERY_STALE_TIME,
+  });
+
+  const conversations = isAuthenticated
+    ? (query.data?.pages.flatMap((page) => page.data ?? []) ?? [])
+    : [];
+  const error = query.error instanceof Error ? query.error.message : null;
+  const isUnauthorizedError = error === "Unauthorized";
 
   const refresh = useCallback(async () => {
-    if (!isAuthenticated) {
-      setConversations([]);
-      setHasMore(false);
-      setError(null);
-      return;
-    }
-    setIsLoading(true);
-    setError(null);
-    try {
-      const res = await fetchConversations({
-        limit: PAGE_SIZE,
-        sort_by: "-updated_at",
-      });
-      setConversations(res.data ?? []);
-      setHasMore(res.has_more ?? false);
-    } catch (e) {
-      setError(e instanceof Error ? e.message : "대화 목록을 불러오지 못했습니다.");
-      setConversations([]);
-      setHasMore(false);
-    } finally {
-      setIsLoading(false);
-    }
-  }, [isAuthenticated]);
+    if (!isAuthenticated) return;
+    await query.refetch();
+  }, [isAuthenticated, query]);
 
   const loadMore = useCallback(async () => {
-    if (!isAuthenticated || isLoadingMore || !hasMore || conversations.length === 0) return;
-    const last = conversations[conversations.length - 1];
-    if (!last?.id) return;
-    setIsLoadingMore(true);
-    try {
-      const res = await fetchConversations({
-        last_id: last.id,
-        limit: PAGE_SIZE,
-        sort_by: "-updated_at",
-      });
-      const next = res.data ?? [];
-      setConversations((prev) => [...prev, ...next]);
-      setHasMore(res.has_more ?? false);
-    } catch {
-      setHasMore(false);
-    } finally {
-      setIsLoadingMore(false);
-    }
-  }, [isAuthenticated, isLoadingMore, hasMore, conversations]);
+    if (!query.hasNextPage || query.isFetchingNextPage) return;
+    await query.fetchNextPage();
+  }, [query]);
 
-  useEffect(() => {
-    void refresh();
-  }, [refresh]);
-
-  return { conversations, isLoading, isLoadingMore, hasMore, error, refresh, loadMore };
+  return {
+    conversations,
+    isLoading: isAuthenticated && (query.isPending || (query.isFetching && conversations.length === 0)),
+    isLoadingMore: query.isFetchingNextPage,
+    hasMore: isAuthenticated && Boolean(query.hasNextPage),
+    error: isAuthenticated && !isUnauthorizedError ? error : null,
+    refresh,
+    loadMore,
+  };
 }
