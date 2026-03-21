@@ -13,17 +13,17 @@ export const dynamic = "force-dynamic";
 
 export const metadata: Metadata = {
   title: {
-    absolute: "CCC AI 씨앗 순장 | TST·새생활·성경·CCC 질문 도우미",
+    absolute: "CCC AI 씨앗 순장",
   },
   description:
-    "CCC AI 씨앗 순장과 TST, 새생활, 성경, CCC 관련 질문을 빠르게 묻고 답변받아보세요.",
+    "CCC AI 씨앗 순장에게 새생활의 시작, 성경, CCC 관련 질문을 빠르게 묻고 답변받아보세요.",
   keywords: [
     "CCC",
     "씨앗 순장",
     "AI 챗봇",
-    "TST",
-    "새생활",
-    "성경",
+    "부산지구",
+    "부산지구 AI",
+    "성경AI",
     "순모임",
     "캠퍼스 사역",
   ],
@@ -43,9 +43,9 @@ export const metadata: Metadata = {
   },
   openGraph: {
     url: "/",
-    title: "CCC AI 씨앗 순장 | TST·새생활·성경·CCC 질문 도우미",
+    title: "CCC AI 씨앗 순장",
     description:
-      "CCC AI 씨앗 순장과 TST, 새생활, 성경, CCC 관련 질문을 빠르게 묻고 답변받아보세요.",
+    "CCC AI 씨앗 순장에게 새생활의 시작, 성경, CCC 관련 질문을 빠르게 묻고 답변받아보세요.",
     images: [
       {
         url: siteConfig.ogImage,
@@ -57,9 +57,9 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: "summary_large_image",
-    title: "CCC AI 씨앗 순장 | TST·새생활·성경·CCC 질문 도우미",
+    title: "CCC AI 씨앗 순장",
     description:
-      "CCC AI 씨앗 순장과 TST, 새생활, 성경, CCC 관련 질문을 빠르게 묻고 답변받아보세요.",
+    "CCC AI 씨앗 순장에게 새생활의 시작, 성경, CCC 관련 질문을 빠르게 묻고 답변받아보세요.",
     images: [siteConfig.ogImage],
   },
 };
@@ -109,7 +109,7 @@ export default async function Page() {
         operatingSystem: "Web",
         inLanguage: "ko-KR",
         description:
-          "CCC AI 씨앗 순장과 TST, 새생활, 성경, CCC 관련 질문을 빠르게 묻고 답변받을 수 있는 웹 서비스",
+          "CCC AI 씨앗 순장과 새생활, 성경, CCC 관련 질문을 질문할 수 있는 서비스",
         isAccessibleForFree: true,
         image: `${siteConfig.url}${siteConfig.ogImage}`,
       },

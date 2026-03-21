@@ -120,14 +120,16 @@ export async function streamChat({
           const title = data?.title as string | undefined;
 
           if (nodeType === "knowledge-retrieval") {
-            if (title?.includes("TST")) {
-              onNodeStart?.("TST 정보 찾아보는 중…");
+            if (title?.includes("순론")) {
+              onNodeStart?.("순론노트 정보 찾아보는 중…");
             } else if (title?.includes("새생활")) {
               onNodeStart?.("새생활 교재에서 관련 부분 찾는 중…");
             } else if (title?.includes("성경")) {
               onNodeStart?.("성경 본문에서 관련 부분 찾는 중…");
             } else if (title?.includes("CCC")) {
               onNodeStart?.("CCC 관련 정보 찾는 중...");
+            }else if (title?.includes("부산지구")) {
+              onNodeStart?.("부산지구 관련 정보 찾는 중...");
             }
           }
         }

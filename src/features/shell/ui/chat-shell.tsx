@@ -15,7 +15,6 @@ import {
   HISTORY_QUERY_STALE_TIME,
   historyQueryKeys,
 } from "@/features/history/model/query-keys";
-import { Spinner } from "@/components/ui/spinner";
 import { ChatHeader } from "@/features/shell/ui/chat-header";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
@@ -181,19 +180,6 @@ export function ChatShell() {
     },
     [stopActiveStream, queryClient, authUserId, loadConversation],
   );
-
-  if (isAuthLoading) {
-    return (
-      <main className="fixed inset-0 flex h-dvh w-full flex-col overflow-hidden bg-background text-foreground">
-        <div className="relative z-10 flex h-full w-full items-center justify-center">
-          <div className="flex flex-col items-center gap-3">
-            <Spinner className="size-8 text-foreground/80" />
-            <p className="text-xs text-foreground/60">로그인 정보 확인중</p>
-          </div>
-        </div>
-      </main>
-    );
-  }
 
   return (
     <main className="fixed inset-0 flex h-dvh w-full flex-col overflow-hidden bg-background text-foreground supports-[height:100cqh]:h-[100cqh] supports-[height:100svh]:h-[100svh]">
