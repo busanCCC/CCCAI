@@ -6,12 +6,15 @@ type ServerEnv = {
 };
 
 type SupabaseEnv = {
-  NEXT_PUBLIC_SUPABASE_URL: string;
-  NEXT_PUBLIC_SUPABASE_PUBLISHABLE_DEFAULT_KEY: string;
+  SUPABASE_URL: string;
+  SUPABASE_PUBLISHABLE_DEFAULT_KEY: string;
 };
 
 function resolveSupabasePublishableKey() {
   return (
+    process.env.SUPABASE_PUBLISHABLE_DEFAULT_KEY ||
+    process.env.SUPABASE_PUBLISHABLE_KEY ||
+    process.env.SUPABASE_ANON_KEY ||
     process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_DEFAULT_KEY ||
     process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY ||
     process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY ||
@@ -37,14 +40,14 @@ export function getServerEnv(): ServerEnv {
 }
 
 export function getSupabaseEnv(): SupabaseEnv {
-  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
+  const supabaseUrl = process.env.SUPABASE_URL || process.env.NEXT_PUBLIC_SUPABASE_URL;
   const supabasePublishableKey = resolveSupabasePublishableKey();
 
   if (!supabaseUrl || !supabasePublishableKey) {
     const missing = [
-      !supabaseUrl ? "NEXT_PUBLIC_SUPABASE_URL" : null,
+      !supabaseUrl ? "SUPABASE_URL (or NEXT_PUBLIC_SUPABASE_URL)" : null,
       !supabasePublishableKey
-        ? "NEXT_PUBLIC_SUPABASE_PUBLISHABLE_DEFAULT_KEY (or NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY)"
+        ? "SUPABASE_PUBLISHABLE_DEFAULT_KEY (or SUPABASE_PUBLISHABLE_KEY / SUPABASE_ANON_KEY)"
         : null,
     ]
       .filter(Boolean)
@@ -53,13 +56,13 @@ export function getSupabaseEnv(): SupabaseEnv {
   }
 
   return {
-    NEXT_PUBLIC_SUPABASE_URL: supabaseUrl,
-    NEXT_PUBLIC_SUPABASE_PUBLISHABLE_DEFAULT_KEY: supabasePublishableKey,
+    SUPABASE_URL: supabaseUrl,
+    SUPABASE_PUBLISHABLE_DEFAULT_KEY: supabasePublishableKey,
   };
 }
 
 export function getSupabaseEnvOrNull(): SupabaseEnv | null {
-  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
+  const supabaseUrl = process.env.SUPABASE_URL || process.env.NEXT_PUBLIC_SUPABASE_URL;
   const supabasePublishableKey = resolveSupabasePublishableKey();
 
   if (!supabaseUrl || !supabasePublishableKey) {
@@ -67,7 +70,7 @@ export function getSupabaseEnvOrNull(): SupabaseEnv | null {
   }
 
   return {
-    NEXT_PUBLIC_SUPABASE_URL: supabaseUrl,
-    NEXT_PUBLIC_SUPABASE_PUBLISHABLE_DEFAULT_KEY: supabasePublishableKey,
+    SUPABASE_URL: supabaseUrl,
+    SUPABASE_PUBLISHABLE_DEFAULT_KEY: supabasePublishableKey,
   };
 }
