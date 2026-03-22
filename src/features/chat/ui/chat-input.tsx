@@ -39,7 +39,7 @@ export function ChatInput({ value, onChange, onSend, disabled }: ChatInputProps)
         disabled={disabled || !value.trim()}
         size="icon"
         aria-label="메시지 보내기"
-        className="h-10 w-10 shrink-0 rounded-full bg-primary text-primary-foreground shadow-sm hover:-translate-y-0.5 hover:shadow-lg hover:bg-yellow-400 transition-all active:translate-y-0"
+        className="h-10 w-10 shrink-0 rounded-[16px] bg-primary text-primary-foreground shadow-none hover:translate-y-0 hover:bg-primary/92"
       >
         <ArrowUp className="h-5 w-5" aria-hidden="true" />
       </Button>

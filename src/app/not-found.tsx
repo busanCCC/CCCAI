@@ -33,7 +33,7 @@ export default function NotFound() {
         </div>
 
         <div className="mt-10 flex justify-center">
-          <Button asChild className="h-11 rounded-full px-6">
+          <Button asChild className="h-11 rounded-2xl px-6">
             <Link href="/">홈으로 돌아가기</Link>
           </Button>
         </div>

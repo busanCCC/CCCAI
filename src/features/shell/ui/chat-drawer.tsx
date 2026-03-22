@@ -68,7 +68,7 @@ export function ChatDrawer({
       <Drawer direction="left" open={isOpen} onOpenChange={setIsOpen}>
         <DrawerTrigger asChild>
           <button
-            className="p-2 rounded-lg transition-colors duration-150 hover:bg-accent active:bg-accent/80 active:scale-[0.95] transform"
+            className="rounded-[18px] bg-transparent p-2.5 text-foreground/80 transition-colors duration-150 hover:bg-transparent hover:text-foreground"
             aria-label="메뉴 열기"
           >
             <Menu className="w-5 h-5" />
@@ -89,7 +89,7 @@ export function ChatDrawer({
             <DrawerClose asChild>
               <button
                 type="button"
-                className="rounded-full p-2 text-muted-foreground transition-colors hover:bg-accent hover:text-foreground"
+                className="rounded-[16px] bg-transparent p-2 text-muted-foreground transition-colors duration-150 hover:bg-transparent hover:text-foreground"
                 aria-label="메뉴 닫기"
               >
                 <X className="h-5 w-5" />
@@ -102,7 +102,7 @@ export function ChatDrawer({
                 <Link
                   key={item.label}
                   href={item.link}
-                  className="flex items-center gap-3 px-3 py-3 -mx-1 rounded-lg cursor-pointer transition-colors duration-150 hover:bg-accent active:bg-accent/80 active:scale-[0.98] transform"
+                  className="mx-0 flex items-center gap-3 rounded-[18px] px-3.5 py-3 text-foreground/85 transition-colors duration-150 hover:bg-muted hover:text-foreground"
                 >
                   {item.icon === "House" && <House className="w-4 h-4 shrink-0" />}
                   {item.icon === "Captions" && (
@@ -152,9 +152,9 @@ export function ChatDrawer({
                             <button
                               type="button"
                               onClick={() => onSelectConversation(conv.id)}
-                              className={`w-full flex flex-col items-start gap-0.5 px-3 py-2.5 -mx-1 rounded-lg text-left transition-colors duration-150 hover:bg-accent active:bg-accent/80 ${
+                              className={`w-full flex flex-col items-start gap-0.5 rounded-[18px] px-3.5 py-3 text-left transition-colors duration-150 hover:bg-muted ${
                                 currentConversationId === conv.id
-                                  ? "bg-accent/80"
+                                  ? "bg-muted"
                                   : ""
                               }`}
                             >
@@ -175,7 +175,7 @@ export function ChatDrawer({
                           type="button"
                           onClick={() => void loadMore()}
                           disabled={isLoadingMore}
-                          className="w-full flex items-center justify-center gap-2 rounded-lg py-2.5 text-sm font-medium text-muted-foreground transition-colors hover:bg-accent hover:text-foreground disabled:opacity-50"
+                          className="flex w-full items-center justify-center gap-2 rounded-[18px] bg-muted/75 py-3 text-sm font-semibold tracking-[-0.01em] text-muted-foreground transition-colors hover:bg-muted hover:text-foreground disabled:opacity-50"
                         >
                           {isLoadingMore ? (
                             <>

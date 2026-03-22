@@ -24,10 +24,10 @@ export default function AuthErrorPage() {
         </div>
 
         <div className="mt-auto grid grid-cols-2 gap-2 pb-2 sm:pb-10">
-          <Button asChild variant="outline" className="h-12 rounded-lg">
+          <Button asChild variant="outline" className="h-12 rounded-2xl">
             <Link href="/login">다시 로그인</Link>
           </Button>
-          <Button asChild className="h-12 rounded-lg">
+          <Button asChild className="h-12 rounded-2xl">
             <Link href="/">홈으로 이동</Link>
           </Button>
         </div>

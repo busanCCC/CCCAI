@@ -9,3 +9,8 @@ export const EXAMPLE_QUESTIONS = [
   "인제대에 대해 알려줘.",
   "부산지구 책임 간사님이 누구야?"
 ];
+
+export function getRandomExampleQuestions(count = 2) {
+  const shuffled = [...EXAMPLE_QUESTIONS].sort(() => Math.random() - 0.5);
+  return shuffled.slice(0, Math.min(count, shuffled.length));
+}

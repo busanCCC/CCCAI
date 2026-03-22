@@ -4,7 +4,7 @@ import { useQueryClient } from "@tanstack/react-query";
 import { ChatInput } from "@/features/chat/ui/chat-input";
 import { ChatThread } from "@/features/chat/ui/chat-thread";
 import { streamChat } from "@/features/chat/api/stream-chat";
-import { EXAMPLE_QUESTIONS } from "@/features/chat/model/data";
+import { getRandomExampleQuestions } from "@/features/chat/model/data";
 import { useChatStore } from "@/features/chat/model/store";
 import { useAuthSession } from "@/features/auth/model/use-auth-session";
 import {
@@ -44,6 +44,7 @@ export function ChatShell() {
 
   const [input, setInput] = useState("");
   const [suggestionKey, setSuggestionKey] = useState(0);
+  const [inputSuggestions, setInputSuggestions] = useState<string[]>([]);
   const authUserId = user?.id ?? null;
   const activeStreamControllerRef = useRef<AbortController | null>(null);
 
@@ -70,7 +71,15 @@ export function ChatShell() {
   const isStreaming = status === "streaming";
   const isReady = Boolean(userId);
   const isDisabled = isStreaming || !isReady;
-  const inputSuggestions = messages.length === 0 ? EXAMPLE_QUESTIONS.slice(0, 2) : [];
+
+  const refreshInputSuggestions = useCallback(() => {
+    setInputSuggestions(getRandomExampleQuestions(2));
+  }, []);
+
+  useEffect(() => {
+    if (messages.length > 0 || inputSuggestions.length > 0) return;
+    refreshInputSuggestions();
+  }, [messages.length, inputSuggestions.length, refreshInputSuggestions]);
 
   const invalidateHistoryQueries = useCallback(
     (targetConversationId?: string | null) => {
@@ -157,8 +166,9 @@ export function ChatShell() {
     stopActiveStream();
     startNewConversation();
     setInput("");
+    refreshInputSuggestions();
     setSuggestionKey((prev) => prev + 1);
-  }, [stopActiveStream, startNewConversation]);
+  }, [stopActiveStream, startNewConversation, refreshInputSuggestions]);
 
   const handleSelectConversation = useCallback(
     async (selectedConversationId: string) => {
@@ -188,13 +198,12 @@ export function ChatShell() {
         <div className="flex-none px-4 py-4 md:px-0 md:py-6">
           <div className="mx-auto max-w-[600px]">
             <ChatHeader
-              status={status}
               onNewConversation={handleNewConversation}
               isAuthenticated={Boolean(user)}
               authUserId={authUserId}
               currentConversationId={conversationId}
               onSelectConversation={handleSelectConversation}
-              isStreaming={isStreaming}
+              onBeforeAuthAction={stopActiveStream}
             />
           </div>
         </div>
@@ -212,14 +221,14 @@ export function ChatShell() {
         {/* Input Area (Fixed at bottom of flex container) */}
         <div className="flex-none w-full bg-background px-4 pt-2 pb-4 md:px-0 md:pb-6">
           <div className="mx-auto w-full max-w-[600px] space-y-2">
-            {inputSuggestions.length > 0 && (
+            {messages.length === 0 && inputSuggestions.length > 0 && (
               <div className="grid grid-cols-2 gap-2">
                 {inputSuggestions.map((question) => (
                   <button
                     key={question}
                     type="button"
                     onClick={() => setInput(question)}
-                    className="rounded-2xl border border-border/35 bg-background px-3 py-2 text-left text-xs leading-snug font-medium text-foreground/65 hover:bg-accent/20 hover:text-foreground/85 sm:text-sm"
+                    className="rounded-[18px] bg-muted/75 px-3.5 py-3 text-left text-xs leading-snug font-semibold tracking-[-0.01em] text-foreground/68 hover:bg-muted hover:text-foreground sm:text-sm"
                   >
                     {question}
                   </button>

@@ -3,6 +3,7 @@
 type ServerEnv = {
   DIFY_BASE_URL: string;
   DIFY_API_KEY: string;
+  DIFY_GUEST_API_KEY: string | null;
 };
 
 type SupabaseEnv = {
@@ -25,6 +26,7 @@ function resolveSupabasePublishableKey() {
 export function getServerEnv(): ServerEnv {
   const baseUrl = process.env.DIFY_BASE_URL;
   const apiKey = process.env.DIFY_API_KEY;
+  const guestApiKey = process.env.DIFY_GUEST_API_KEY ?? null;
 
   if (!baseUrl || !apiKey) {
     const missing = [!baseUrl ? "DIFY_BASE_URL" : null, !apiKey ? "DIFY_API_KEY" : null]
@@ -36,6 +38,7 @@ export function getServerEnv(): ServerEnv {
   return {
     DIFY_BASE_URL: baseUrl,
     DIFY_API_KEY: apiKey,
+    DIFY_GUEST_API_KEY: guestApiKey,
   };
 }
 

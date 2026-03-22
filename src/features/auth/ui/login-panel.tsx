@@ -80,7 +80,7 @@ export function LoginPanel() {
             onClick={() => handleSignIn(provider.key)}
             disabled={Boolean(loadingProvider)}
             className={cn(
-              "h-14 w-full justify-center gap-3 rounded-lg border text-base font-semibold md:h-16 md:text-lg",
+              "h-14 w-full justify-center gap-3 rounded-[20px] border text-base font-semibold md:h-16 md:text-lg",
               provider.className,
             )}
           >

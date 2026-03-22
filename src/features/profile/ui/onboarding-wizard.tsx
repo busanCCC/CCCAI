@@ -215,7 +215,7 @@ export function OnboardingWizard({ initialProfile }: OnboardingWizardProps) {
           variant="outline"
           onClick={() => setStep((prev) => (prev > 1 ? ((prev - 1) as Step) : prev))}
           disabled={step === 1 || isSubmitting}
-          className="h-11 rounded-full px-6"
+          className="h-11 rounded-2xl px-6"
         >
           이전
         </Button>
@@ -225,7 +225,7 @@ export function OnboardingWizard({ initialProfile }: OnboardingWizardProps) {
             type="button"
             onClick={() => setStep((prev) => (prev < 3 ? ((prev + 1) as Step) : prev))}
             disabled={(step === 1 && typeof isBusanDistrict !== "boolean") || (step === 2 && !role)}
-            className="h-11 rounded-full px-6"
+            className="h-11 rounded-2xl px-6"
           >
             다음
           </Button>
@@ -234,7 +234,7 @@ export function OnboardingWizard({ initialProfile }: OnboardingWizardProps) {
             type="button"
             onClick={handleSave}
             disabled={!canSubmit}
-            className="h-11 rounded-full px-6"
+            className="h-11 rounded-2xl px-6"
           >
             {isSubmitting ? "저장 중..." : "완료하고 시작하기"}
           </Button>

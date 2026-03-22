@@ -2,6 +2,7 @@
 
 import { useQueryClient } from "@tanstack/react-query";
 import { usePathname, useRouter } from "next/navigation";
+import { useState } from "react";
 import { toast } from "sonner";
 
 import { Button } from "@/components/ui/button";
@@ -10,22 +11,32 @@ import { useChatStore } from "@/features/chat/model/store";
 import { historyQueryKeys } from "@/features/history/model/query-keys";
 
 type AuthControlsProps = {
-  disabled?: boolean;
+  onBeforeAuthAction?: () => void | Promise<void>;
 };
 
-export function AuthControls({ disabled }: AuthControlsProps) {
+export function AuthControls({ onBeforeAuthAction }: AuthControlsProps) {
   const router = useRouter();
   const pathname = usePathname();
   const { user, isLoading, signOut } = useAuthSession();
   const queryClient = useQueryClient();
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const handleLogin = () => {
+  const runBeforeAuthAction = async () => {
+    await onBeforeAuthAction?.();
+  };
+
+  const handleLogin = async () => {
     const next = pathname || "/";
+    await runBeforeAuthAction();
     router.push(`/login?next=${encodeURIComponent(next)}`);
   };
 
   const handleSignOut = async () => {
+    if (isSubmitting) return;
+
+    setIsSubmitting(true);
     try {
+      await runBeforeAuthAction();
       await signOut();
       queryClient.removeQueries({ queryKey: historyQueryKeys.all });
       useChatStore.getState().resetSession();
@@ -35,6 +46,8 @@ export function AuthControls({ disabled }: AuthControlsProps) {
     } catch (error) {
       const message = error instanceof Error ? error.message : "로그아웃 중 오류가 발생했습니다.";
       toast.error(message);
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
@@ -48,9 +61,8 @@ export function AuthControls({ disabled }: AuthControlsProps) {
         type="button"
         variant="outline"
         size="sm"
-        onClick={handleLogin}
-        disabled={disabled}
-        className="rounded-full"
+        onClick={() => void handleLogin()}
+        className="rounded-2xl"
       >
         로그인
       </Button>
@@ -63,10 +75,10 @@ export function AuthControls({ disabled }: AuthControlsProps) {
       variant="outline"
       size="sm"
       onClick={handleSignOut}
-      disabled={disabled}
-      className="rounded-full"
+      disabled={isSubmitting}
+      className="rounded-2xl"
     >
-      로그아웃
+      {isSubmitting ? "로그아웃 중..." : "로그아웃"}
     </Button>
   );
 }
