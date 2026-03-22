@@ -24,6 +24,7 @@ type ChatState = {
   startAssistantMessage: () => string;
   appendAssistantChunk: (messageId: string, chunk: string) => void;
   finalizeConversationId: (conversationId?: string | null) => void;
+  ensureAssistantMessageContent: (messageId: string, content: string) => void;
   setError: (message: string) => void;
   clearError: () => void;
   setProcessingStatus: (status: string | null) => void;
@@ -110,6 +111,20 @@ export const useChatStore = create<ChatState>((set) => ({
         processingStatus: null,
       };
     });
+  },
+  ensureAssistantMessageContent: (messageId, content) => {
+    if (!content.trim()) return;
+    set((state) => ({
+      messages: state.messages.map((message) => {
+        if (message.id !== messageId || message.role !== "assistant") {
+          return message;
+        }
+        if (message.content.trim().length > 0) {
+          return message;
+        }
+        return { ...message, content };
+      }),
+    }));
   },
   setError: (message) => {
     set({

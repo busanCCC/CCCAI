@@ -19,6 +19,8 @@ import { ChatHeader } from "@/features/shell/ui/chat-header";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
 
+const EMPTY_ASSISTANT_FALLBACK_MESSAGE = "오류가 발생했어. 다시 한번 질문해줄래?";
+
 export function ChatShell() {
   const {
     messages,
@@ -33,6 +35,7 @@ export function ChatShell() {
     startAssistantMessage,
     appendAssistantChunk,
     finalizeConversationId,
+    ensureAssistantMessageContent,
     setError,
     clearError,
     setProcessingStatus,
@@ -53,13 +56,6 @@ export function ChatShell() {
   }, [initFromStorage]);
 
   useEffect(() => {
-    if (isAuthLoading) return;
-    if (user?.id) {
-      setUserId(user.id);
-    }
-  }, [isAuthLoading, setUserId, user?.id]);
-
-  useEffect(() => {
     if (errorMessage) {
       toast.error(errorMessage, {
         onAutoClose: () => clearError(),
@@ -75,6 +71,26 @@ export function ChatShell() {
   const refreshInputSuggestions = useCallback(() => {
     setInputSuggestions(getRandomExampleQuestions(2));
   }, []);
+
+  useEffect(() => {
+    if (isAuthLoading) return;
+    if (user?.id) {
+      if (userId && userId !== user.id) {
+        startNewConversation();
+        setInput("");
+        refreshInputSuggestions();
+        setSuggestionKey((prev) => prev + 1);
+      }
+      setUserId(user.id);
+    }
+  }, [
+    isAuthLoading,
+    refreshInputSuggestions,
+    setUserId,
+    startNewConversation,
+    user?.id,
+    userId,
+  ]);
 
   useEffect(() => {
     if (messages.length > 0 || inputSuggestions.length > 0) return;
@@ -138,8 +154,12 @@ export function ChatShell() {
         signal: streamController.signal,
         onChunk: (chunk) => appendAssistantChunk(assistantId, chunk),
         onConversationId: (nextId) => finalizeConversationId(nextId),
-        onError: (message) => setError(message),
+        onError: (message) => {
+          ensureAssistantMessageContent(assistantId, EMPTY_ASSISTANT_FALLBACK_MESSAGE);
+          setError(message);
+        },
         onDone: () => {
+          ensureAssistantMessageContent(assistantId, EMPTY_ASSISTANT_FALLBACK_MESSAGE);
           finalizeConversationId();
           invalidateHistoryQueries(useChatStore.getState().conversationId);
         },
@@ -157,6 +177,7 @@ export function ChatShell() {
     startAssistantMessage,
     appendAssistantChunk,
     finalizeConversationId,
+    ensureAssistantMessageContent,
     invalidateHistoryQueries,
     setError,
     setProcessingStatus,
