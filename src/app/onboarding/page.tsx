@@ -38,8 +38,8 @@ export default async function OnboardingPage() {
   }
 
   return (
-    <main className="relative min-h-dvh w-full overflow-hidden bg-background text-foreground">
-      <div className="relative z-10 mx-auto flex min-h-dvh w-full max-w-3xl">
+    <main className="desktop-page-backdrop relative min-h-dvh w-full overflow-hidden bg-background text-foreground">
+      <div className="desktop-page-surface relative z-10 mx-auto flex min-h-dvh w-full max-w-3xl">
         <OnboardingWizard initialProfile={snapshot} />
       </div>
     </main>

@@ -11,7 +11,7 @@ export function EmptyState() {
           width={449}
           height={257}
           priority
-          className="h-auto w-full object-contain"
+          className="drag-none h-auto w-full object-contain select-none"
         />
       </div>
     </div>

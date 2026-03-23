@@ -5,6 +5,7 @@ import { createSseParser } from "@/features/chat/model/utils";
 export type ChatStreamHandlers = {
   onChunk: (chunk: string) => void;
   onConversationId: (conversationId: string) => void;
+  onTaskId?: (taskId: string) => void;
   onError: (message: string) => void;
   onDone?: () => void;
   onNodeStart?: (status: string) => void;
@@ -27,6 +28,7 @@ export async function streamChat({
   signal,
   onChunk,
   onConversationId,
+  onTaskId,
   onError,
   onDone,
   onNodeStart,
@@ -100,6 +102,10 @@ export async function streamChat({
           payload = null;
         }
         if (!payload) continue;
+        const taskId = typeof payload.task_id === "string" ? payload.task_id : "";
+        if (taskId) {
+          onTaskId?.(taskId);
+        }
         const event = payload.event;
         if (event === "message") {
           const answer = typeof payload.answer === "string" ? payload.answer : "";
@@ -128,7 +134,7 @@ export async function streamChat({
               onNodeStart?.("성경 본문에서 관련 부분 찾는 중…");
             } else if (title?.includes("CCC")) {
               onNodeStart?.("CCC 관련 정보 찾는 중...");
-            }else if (title?.includes("부산지구")) {
+            } else if (title?.includes("부산지구")) {
               onNodeStart?.("부산지구 관련 정보 찾는 중...");
             }
           }
@@ -179,4 +185,36 @@ export async function streamChat({
     }
     if (!didError && !wasAborted) onDone?.();
   }
+}
+
+type StopChatGenerationParams = {
+  taskId: string;
+  userId: string;
+};
+
+export async function stopChatGeneration({
+  taskId,
+  userId,
+}: StopChatGenerationParams) {
+  const response = await fetch(`/api/chat/${taskId}/stop`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    credentials: "include",
+    cache: "no-store",
+    body: JSON.stringify({ user: userId }),
+  });
+
+  if (!response.ok) {
+    const payload = await response.json().catch(() => null);
+    const message =
+      payload?.error ||
+      payload?.details ||
+      (await response.text().catch(() => "")) ||
+      `Request failed (${response.status})`;
+    throw new Error(typeof message === "string" ? message : "Failed to stop chat generation");
+  }
+
+  return response.json().catch(() => ({ result: "success" as const }));
 }

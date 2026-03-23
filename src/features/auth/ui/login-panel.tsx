@@ -66,7 +66,7 @@ export function LoginPanel() {
           alt="씨앗 순장"
           width={449}
           height={257}
-          className="h-auto w-full max-w-[240px] object-contain sm:max-w-[300px]"
+          className="drag-none h-auto w-full max-w-[240px] object-contain select-none sm:max-w-[300px]"
         />
       </div>
 

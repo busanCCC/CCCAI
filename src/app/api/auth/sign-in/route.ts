@@ -7,6 +7,7 @@ import { getSupabaseEnvOrNull } from "@/lib/env";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 
 const ALLOWED_PROVIDERS: Provider[] = ["kakao"];
+const AUTH_NEXT_COOKIE = "cccai-auth-next";
 
 function getSafeNext(value: string | null) {
   return value && value.startsWith("/") ? value : "/";
@@ -29,7 +30,7 @@ export async function GET(request: NextRequest) {
 
   try {
     const supabase = await createSupabaseServerClient();
-    const redirectTo = `${appUrl}/auth/callback?next=${encodeURIComponent(safeNext)}`;
+    const redirectTo = `${appUrl}/auth/callback`;
     const { data, error } = await supabase.auth.signInWithOAuth({
       provider: provider as Provider,
       options: {
@@ -41,7 +42,16 @@ export async function GET(request: NextRequest) {
       return NextResponse.redirect(new URL("/auth/error", appUrl));
     }
 
-    return NextResponse.redirect(data.url);
+    const response = NextResponse.redirect(data.url);
+    response.cookies.set(AUTH_NEXT_COOKIE, safeNext, {
+      httpOnly: true,
+      sameSite: "lax",
+      secure: appUrl.startsWith("https://"),
+      path: "/",
+      maxAge: 60 * 10,
+    });
+
+    return response;
   } catch {
     return NextResponse.redirect(new URL("/auth/error", appUrl));
   }

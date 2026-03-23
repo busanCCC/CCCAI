@@ -139,6 +139,29 @@
   }
 }
 
+@layer utilities {
+  .drag-none {
+    -webkit-user-drag: none;
+    user-select: none;
+  }
+
+  .desktop-page-backdrop {
+    @media (width >= 48rem) {
+      background-color: #f2ede1;
+    }
+  }
+
+  .desktop-page-surface {
+    @media (width >= 48rem) {
+      margin-inline: auto;
+      max-width: 760px;
+      border-left: 1px solid #ddd2b6;
+      border-right: 1px solid #ddd2b6;
+      background-color: var(--background);
+    }
+  }
+}
+
 @keyframes aurora {
   0% {
     background-position:

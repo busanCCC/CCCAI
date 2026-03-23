@@ -6,24 +6,28 @@ function trimTrailingSlash(value: string) {
   return value.endsWith("/") ? value.slice(0, -1) : value;
 }
 
-export function getAppUrl(request?: NextRequest) {
-  const isDevelopment = process.env.NODE_ENV === "development";
+function isLocalHost(value: string) {
+  return value.startsWith("localhost") || value.startsWith("127.0.0.1");
+}
 
-  if (request && isDevelopment) {
+export function getAppUrl(request?: NextRequest) {
+  if (request) {
+    const requestOrigin = trimTrailingSlash(new URL(request.url).origin);
     const forwardedProto = request.headers.get("x-forwarded-proto");
     const forwardedHost = request.headers.get("x-forwarded-host");
     const host = forwardedHost || request.headers.get("host");
 
-    if (host) {
-      const protocol =
-        forwardedProto || host.startsWith("localhost") || host.startsWith("127.0.0.1")
-          ? "http"
-          : "https";
-
-      return `${protocol}://${trimTrailingSlash(host)}`;
+    if (host && isLocalHost(host)) {
+      return `${forwardedProto === "https" ? "https" : "http"}://${trimTrailingSlash(host)}`;
     }
 
-    return trimTrailingSlash(new URL(request.url).origin);
+    if (isLocalHost(new URL(requestOrigin).host)) {
+      return requestOrigin;
+    }
+
+    if (process.env.NODE_ENV === "development") {
+      return requestOrigin;
+    }
   }
 
   const configuredUrl =

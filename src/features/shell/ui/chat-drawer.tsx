@@ -83,7 +83,7 @@ export function ChatDrawer({
                 alt="씨앗 순장"
                 width={449}
                 height={257}
-                className="h-auto w-full object-contain"
+                className="drag-none h-auto w-full object-contain select-none"
               />
             </div>
             <DrawerClose asChild>

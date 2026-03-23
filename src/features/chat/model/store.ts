@@ -4,12 +4,19 @@ import { create } from "zustand";
 
 import { createId, createUserId } from "@/lib/id";
 import {
-  readStorage,
-  removeStorage,
-  STORAGE_KEYS,
-  writeStorage,
+  isGuestUserId,
+  migrateLegacyChatStorage,
+  persistConversationId,
+  persistGuestUserId,
+  readConversationId,
+  readGuestUserId,
+  removeConversationId,
 } from "@/features/chat/model/utils";
 import type { ChatMessage, ChatStatus } from "@/features/chat/model/types";
+
+type HydrateSessionOptions = {
+  restoreConversation?: boolean;
+};
 
 type ChatState = {
   messages: ChatMessage[];
@@ -18,7 +25,10 @@ type ChatState = {
   status: ChatStatus;
   errorMessage: string | null;
   processingStatus: string | null;
-  initFromStorage: () => void;
+  hydrateSession: (
+    authUserId?: string | null,
+    options?: HydrateSessionOptions,
+  ) => void;
   startNewConversation: () => void;
   addUserMessage: (text: string) => void;
   startAssistantMessage: () => string;
@@ -28,32 +38,71 @@ type ChatState = {
   setError: (message: string) => void;
   clearError: () => void;
   setProcessingStatus: (status: string | null) => void;
-  setUserId: (userId: string) => void;
   resetSession: () => void;
   loadConversation: (conversationId: string, messages: ChatMessage[]) => void;
 };
 
-export const useChatStore = create<ChatState>((set) => ({
+function getOrCreateGuestUserId() {
+  const storedGuestUserId = readGuestUserId();
+  if (storedGuestUserId && storedGuestUserId.length > 0) {
+    return storedGuestUserId;
+  }
+
+  const nextGuestUserId = createUserId();
+  persistGuestUserId(nextGuestUserId);
+  return nextGuestUserId;
+}
+
+export const useChatStore = create<ChatState>((set, get) => ({
   messages: [],
   conversationId: null,
   userId: "",
   status: "idle",
   errorMessage: null,
   processingStatus: null,
-  initFromStorage: () => {
-    const storedConversationId = readStorage(STORAGE_KEYS.conversationId);
-    const storedUserId = readStorage(STORAGE_KEYS.userId);
-    const userId = storedUserId && storedUserId.length > 0 ? storedUserId : createUserId();
-    if (!storedUserId) {
-      writeStorage(STORAGE_KEYS.userId, userId);
+  hydrateSession: (authUserId, options) => {
+    const normalizedAuthUserId = authUserId?.trim() ?? "";
+    const currentState = get();
+    const currentUserId = currentState.userId;
+    const shouldRestoreConversation =
+      Boolean(normalizedAuthUserId) && (options?.restoreConversation ?? true);
+
+    migrateLegacyChatStorage(normalizedAuthUserId || null);
+
+    const nextUserId = normalizedAuthUserId || getOrCreateGuestUserId();
+    const restoredConversationId = shouldRestoreConversation
+      ? readConversationId(nextUserId)
+      : null;
+
+    if (
+      currentUserId &&
+      currentUserId !== nextUserId &&
+      isGuestUserId(currentUserId)
+    ) {
+      removeConversationId(currentUserId);
     }
+
+    const shouldKeepCurrentMessages =
+      currentUserId === nextUserId &&
+      currentState.messages.length > 0 &&
+      (!shouldRestoreConversation || currentState.conversationId === restoredConversationId);
+
     set({
-      conversationId: storedConversationId || null,
-      userId,
+      messages: shouldKeepCurrentMessages ? currentState.messages : [],
+      conversationId: shouldKeepCurrentMessages
+        ? currentState.conversationId
+        : restoredConversationId || null,
+      userId: nextUserId,
+      status: "idle",
+      errorMessage: null,
+      processingStatus: null,
     });
   },
   startNewConversation: () => {
-    removeStorage(STORAGE_KEYS.conversationId);
+    const currentUserId = get().userId;
+    if (currentUserId) {
+      removeConversationId(currentUserId);
+    }
     set({
       messages: [],
       conversationId: null,
@@ -102,8 +151,8 @@ export const useChatStore = create<ChatState>((set) => ({
     set((state) => {
       const nextId =
         conversationId && conversationId.length > 0 ? conversationId : state.conversationId;
-      if (nextId) {
-        writeStorage(STORAGE_KEYS.conversationId, nextId);
+      if (nextId && state.userId) {
+        persistConversationId(state.userId, nextId);
       }
       return {
         conversationId: nextId ?? null,
@@ -139,16 +188,19 @@ export const useChatStore = create<ChatState>((set) => ({
   setProcessingStatus: (status) => {
     set({ processingStatus: status });
   },
-  setUserId: (userId) => {
-    if (!userId) return;
-    writeStorage(STORAGE_KEYS.userId, userId);
-    set({ userId });
-  },
   resetSession: () => {
-    removeStorage(STORAGE_KEYS.conversationId);
-    removeStorage(STORAGE_KEYS.userId);
+    const currentUserId = get().userId;
+    const storedGuestUserId = readGuestUserId();
+
+    if (currentUserId && isGuestUserId(currentUserId)) {
+      removeConversationId(currentUserId);
+    }
+    if (storedGuestUserId) {
+      removeConversationId(storedGuestUserId);
+    }
+
     const newUserId = createUserId();
-    writeStorage(STORAGE_KEYS.userId, newUserId);
+    persistGuestUserId(newUserId);
     set({
       messages: [],
       conversationId: null,
@@ -159,8 +211,9 @@ export const useChatStore = create<ChatState>((set) => ({
     });
   },
   loadConversation: (conversationId, messages) => {
-    if (conversationId) {
-      writeStorage(STORAGE_KEYS.conversationId, conversationId);
+    const currentUserId = get().userId;
+    if (conversationId && currentUserId) {
+      persistConversationId(currentUserId, conversationId);
     }
     set({
       conversationId: conversationId || null,

@@ -6,26 +6,38 @@ import { toProfileSnapshot } from "@/features/profile/model/types";
 import { getAppUrl } from "@/lib/app-url";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 
+const AUTH_NEXT_COOKIE = "cccai-auth-next";
+
 function pickString(value: unknown): string | null {
   return typeof value === "string" && value.length > 0 ? value : null;
+}
+
+function withClearedAuthNextCookie(response: NextResponse) {
+  response.cookies.set(AUTH_NEXT_COOKIE, "", {
+    httpOnly: true,
+    sameSite: "lax",
+    path: "/",
+    maxAge: 0,
+  });
+  return response;
 }
 
 export async function GET(request: NextRequest) {
   const appUrl = getAppUrl(request);
   const requestUrl = new URL(request.url);
   const code = requestUrl.searchParams.get("code");
-  const next = requestUrl.searchParams.get("next") || "/";
+  const next = request.cookies.get(AUTH_NEXT_COOKIE)?.value || requestUrl.searchParams.get("next") || "/";
   const safeNext = next.startsWith("/") ? next : "/";
 
   if (!code) {
-    return NextResponse.redirect(new URL("/auth/error", appUrl));
+    return withClearedAuthNextCookie(NextResponse.redirect(new URL("/auth/error", appUrl)));
   }
 
   try {
     const supabase = await createSupabaseServerClient();
     const { error } = await supabase.auth.exchangeCodeForSession(code);
     if (error) {
-      return NextResponse.redirect(new URL("/auth/error", appUrl));
+      return withClearedAuthNextCookie(NextResponse.redirect(new URL("/auth/error", appUrl)));
     }
 
     // NOTE: 로그인 직후 서비스용 profiles 행을 생성/갱신한다.
@@ -58,8 +70,10 @@ export async function GET(request: NextRequest) {
       }
     }
 
-    return NextResponse.redirect(new URL(shouldOnboard ? "/onboarding" : safeNext, appUrl));
+    return withClearedAuthNextCookie(
+      NextResponse.redirect(new URL(shouldOnboard ? "/onboarding" : safeNext, appUrl)),
+    );
   } catch {
-    return NextResponse.redirect(new URL("/auth/error", appUrl));
+    return withClearedAuthNextCookie(NextResponse.redirect(new URL("/auth/error", appUrl)));
   }
 }
