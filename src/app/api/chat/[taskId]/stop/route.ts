@@ -5,14 +5,14 @@ import { resolveDifyChatContext } from "@/lib/dify/chat-context";
 export const dynamic = "force-dynamic";
 
 type RouteContext = {
-  params: {
+  params: Promise<{
     taskId: string;
-  };
+  }>;
 };
 
 export async function POST(request: NextRequest, context: RouteContext) {
   try {
-    const { taskId } = context.params;
+    const { taskId } = await context.params;
     const body = await request.json().catch(() => null);
 
     if (!taskId) {
