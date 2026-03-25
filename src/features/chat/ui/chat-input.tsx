@@ -9,7 +9,7 @@ import { Textarea } from "@/components/ui/textarea";
 type ChatInputProps = {
   value: string;
   onChange: (value: string) => void;
-  onSend: () => void;
+  onSend: (value?: string) => void;
   onStop?: () => void;
   isStreaming?: boolean;
   disabled?: boolean;
@@ -60,6 +60,14 @@ export function ChatInput({
     textarea.style.overflowY = textarea.scrollHeight > maxHeight ? "auto" : "hidden";
   }, [value]);
 
+  const triggerSend = React.useCallback(() => {
+    const liveValue = textareaRef.current?.value ?? value;
+    if (!liveValue.trim() || isStreaming || disabled) {
+      return;
+    }
+    onSend(liveValue);
+  }, [disabled, isStreaming, onSend, value]);
+
   const handleKeyDown = (event: React.KeyboardEvent<HTMLTextAreaElement>) => {
     const nativeEvent = event.nativeEvent as KeyboardEvent & { isComposing?: boolean };
     const isImeComposing = nativeEvent.isComposing || nativeEvent.keyCode === 229;
@@ -71,7 +79,7 @@ export function ChatInput({
     if (event.key === "Enter" && !event.shiftKey && !isStreaming && !disabled) {
       event.preventDefault();
       event.stopPropagation();
-      void Promise.resolve().then(() => onSend());
+      void Promise.resolve().then(() => triggerSend());
     }
   };
 
@@ -98,7 +106,7 @@ export function ChatInput({
       />
       <Button
         type="button"
-        onClick={isStreaming ? onStop : onSend}
+        onClick={isStreaming ? onStop : triggerSend}
         disabled={isStreaming ? disabled : isSendDisabled}
         size="icon"
         aria-label={isStreaming ? "응답 중지" : "메시지 보내기"}

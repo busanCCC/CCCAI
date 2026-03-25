@@ -238,8 +238,9 @@ export function ChatShell() {
     };
   }, []);
 
-  const handleSend = useCallback(async () => {
-    const trimmed = input.trim();
+  const handleSend = useCallback(async (nextValue?: string) => {
+    const sourceValue = typeof nextValue === "string" ? nextValue : input;
+    const trimmed = sourceValue.trim();
     if (!trimmed) return;
 
     const {
