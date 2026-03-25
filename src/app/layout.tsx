@@ -4,6 +4,7 @@ import { Analytics } from "@vercel/analytics/next";
 import { Toaster } from "sonner";
 import "./globals.css";
 import { Geist } from "next/font/google";
+import { InAppBrowserToast } from "@/components/providers/in-app-browser-toast";
 import { QueryProvider } from "@/components/providers/query-provider";
 import { siteConfig } from "@/lib/site";
 import { cn } from "@/lib/utils";
@@ -50,6 +51,7 @@ export default function RootLayout({
     <html lang="ko" suppressHydrationWarning className={cn("font-sans", geist.variable)}>
       <body className="min-h-screen bg-background font-sans text-foreground antialiased">
         <QueryProvider>
+          <InAppBrowserToast />
           {children}
           <Toaster closeButton position="top-center" />
           <Analytics />
