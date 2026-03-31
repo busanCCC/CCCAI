@@ -32,8 +32,8 @@ export function ChatThread({
     <div className="h-full w-full overflow-y-auto overscroll-contain scroll-smooth">
       <div className="relative mx-auto min-h-full max-w-[600px] px-4 pt-6 pb-4 text-center md:px-0 md:pt-8">
         {messages.length === 0 && (
-          <div className="absolute inset-0 z-0 flex items-center justify-center px-4">
-            <EmptyState onSuggestionClick={onSuggestionClick} />
+          <div className="absolute inset-0 z-0 flex items-center justify-center px-4 pb-12">
+            <EmptyState  />
           </div>
         )}
 
