@@ -371,6 +371,7 @@ export function ChatShell() {
             messages={messages}
             status={status}
             processingStatus={processingStatus}
+            onSuggestionClick={setInput}
           />
         </div>
 
