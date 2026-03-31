@@ -1,5 +1,5 @@
 import { getServerEnv, getSupabaseEnvOrNull } from "@/lib/env";
-import { createId } from "@/lib/id";
+import { createId, normalizeGuestUserId } from "@/lib/id";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 
 type ResolvedDifyChatContext = {
@@ -13,7 +13,7 @@ export async function resolveDifyChatContext(requestUser?: string | null) {
 
   let user =
     typeof requestUser === "string" && requestUser.length > 0
-      ? requestUser
+      ? normalizeGuestUserId(requestUser)
       : `server_${createId()}`;
   let apiKey = DIFY_GUEST_API_KEY;
 

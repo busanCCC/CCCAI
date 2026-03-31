@@ -1,6 +1,11 @@
 "use client";
 // NOTE: 스토리지 및 SSE 파싱을 위한 채팅 헬퍼
 
+import {
+  isGuestUserId as isGuestUserIdFormat,
+  normalizeGuestUserId,
+} from "@/lib/id";
+
 export const STORAGE_KEYS = {
   guestUserId: "cccai.guestUserId",
   conversationIdPrefix: "cccai.conversationId",
@@ -42,8 +47,32 @@ function getConversationStorageKey(userId: string) {
   return `${STORAGE_KEYS.conversationIdPrefix}:${userId}`;
 }
 
+function migrateConversationIdStorage(sourceUserId: string, targetUserId: string) {
+  if (!sourceUserId || !targetUserId || sourceUserId === targetUserId) {
+    return;
+  }
+
+  const sourceConversationId = readStorage(getConversationStorageKey(sourceUserId));
+  if (sourceConversationId && !readStorage(getConversationStorageKey(targetUserId))) {
+    writeStorage(getConversationStorageKey(targetUserId), sourceConversationId);
+  }
+
+  removeConversationId(sourceUserId);
+}
+
 export function readGuestUserId() {
-  return readStorage(STORAGE_KEYS.guestUserId);
+  const storedGuestUserId = readStorage(STORAGE_KEYS.guestUserId);
+  if (!storedGuestUserId) {
+    return null;
+  }
+
+  const normalizedGuestUserId = normalizeGuestUserId(storedGuestUserId);
+  if (normalizedGuestUserId !== storedGuestUserId) {
+    persistGuestUserId(normalizedGuestUserId);
+    migrateConversationIdStorage(storedGuestUserId, normalizedGuestUserId);
+  }
+
+  return normalizedGuestUserId;
 }
 
 export function persistGuestUserId(userId: string) {
@@ -63,7 +92,7 @@ export function removeConversationId(userId: string) {
 }
 
 export function isGuestUserId(userId: string | null | undefined) {
-  return Boolean(userId && userId.startsWith("user_"));
+  return isGuestUserIdFormat(userId);
 }
 
 export function migrateLegacyChatStorage(authUserId?: string | null) {
@@ -75,8 +104,17 @@ export function migrateLegacyChatStorage(authUserId?: string | null) {
   }
 
   if (legacyUserId && isGuestUserId(legacyUserId)) {
+    const normalizedLegacyGuestUserId = normalizeGuestUserId(legacyUserId);
+
     if (!readGuestUserId()) {
-      persistGuestUserId(legacyUserId);
+      persistGuestUserId(normalizedLegacyGuestUserId);
+    }
+
+    if (
+      legacyConversationId &&
+      !readConversationId(normalizedLegacyGuestUserId)
+    ) {
+      persistConversationId(normalizedLegacyGuestUserId, legacyConversationId);
     }
   }
 
