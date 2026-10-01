@@ -118,10 +118,7 @@ export function LoginPanel() {
           <span>·</span>
           <Drawer>
             <DrawerTrigger asChild>
-              <button
-                type="button"
-                className="underline underline-offset-4 hover:text-foreground"
-              >
+              <button type="button" className="underline underline-offset-4 hover:text-foreground">
                 사업자 정보
               </button>
             </DrawerTrigger>
@@ -130,12 +127,8 @@ export function LoginPanel() {
                 <DrawerTitle>사업자 정보</DrawerTitle>
               </DrawerHeader>
               <div className="space-y-1.5 px-4 pb-2 text-[13px] leading-relaxed text-muted-foreground">
-                <p className="font-semibold text-foreground">
-                  좋은공간 미디어 | 대표 : 윤성현
-                </p>
-                <p>
-                  부산광역시 북구 낙동북로 772번가길 28, 지하 1층(구포동)
-                </p>
+                <p className="font-semibold text-foreground">좋은공간 미디어 | 대표 : 윤성현</p>
+                <p>부산광역시 북구 낙동북로 772번가길 28, 지하 1층(구포동)</p>
                 <p>
                   사업자 등록번호 : 621-14-25692{" "}
                   <a
@@ -160,8 +153,7 @@ export function LoginPanel() {
               </div>
               <div className="px-4 pb-6 pt-2">
                 <p className="text-center text-[11px] text-muted-foreground/60">
-                  &copy; {new Date().getFullYear()} 좋은공간 미디어. All rights
-                  reserved.
+                  &copy; {new Date().getFullYear()} 좋은공간 미디어. All rights reserved.
                 </p>
                 <DrawerClose asChild>
                   <button

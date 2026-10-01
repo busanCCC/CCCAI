@@ -20,9 +20,7 @@ export default function NotFound() {
           </div>
 
           <div className="mt-10 space-y-3">
-            <p className="text-sm font-semibold tracking-[0.2em] text-muted-foreground">
-              404
-            </p>
+            <p className="text-sm font-semibold tracking-[0.2em] text-muted-foreground">404</p>
             <h1 className="text-3xl font-semibold tracking-tight sm:text-4xl">
               페이지를 찾을 수 없어요
             </h1>

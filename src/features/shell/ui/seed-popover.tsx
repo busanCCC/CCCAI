@@ -25,9 +25,7 @@ export function SeedPopover({
           onSelectConversation={onSelectConversation}
         />
       </div>
-      <h1 className="text-lg font-semibold tracking-tight text-foreground/90">
-        CCC 씨앗 순장
-      </h1>
+      <h1 className="text-lg font-semibold tracking-tight text-foreground/90">CCC 씨앗 순장</h1>
     </div>
   );
 }

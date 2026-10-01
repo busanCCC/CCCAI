@@ -1,10 +1,7 @@
 "use client";
 // NOTE: 스토리지 및 SSE 파싱을 위한 채팅 헬퍼
 
-import {
-  isGuestUserId as isGuestUserIdFormat,
-  normalizeGuestUserId,
-} from "@/lib/id";
+import { isGuestUserId as isGuestUserIdFormat, normalizeGuestUserId } from "@/lib/id";
 
 export const STORAGE_KEYS = {
   guestUserId: "cccai.guestUserId",
@@ -110,10 +107,7 @@ export function migrateLegacyChatStorage(authUserId?: string | null) {
       persistGuestUserId(normalizedLegacyGuestUserId);
     }
 
-    if (
-      legacyConversationId &&
-      !readConversationId(normalizedLegacyGuestUserId)
-    ) {
+    if (legacyConversationId && !readConversationId(normalizedLegacyGuestUserId)) {
       persistConversationId(normalizedLegacyGuestUserId, legacyConversationId);
     }
   }

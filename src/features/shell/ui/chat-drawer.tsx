@@ -51,17 +51,11 @@ export function ChatDrawer({
   onSelectConversation,
 }: ChatDrawerProps) {
   const [isOpen, setIsOpen] = useState(false);
-  const {
-    conversations,
-    isLoading,
-    isLoadingMore,
-    hasMore,
-    error,
-    loadMore,
-  } = useConversationHistory({
-    enabled: isOpen,
-    userId: authUserId,
-  });
+  const { conversations, isLoading, isLoadingMore, hasMore, error, loadMore } =
+    useConversationHistory({
+      enabled: isOpen,
+      userId: authUserId,
+    });
 
   return (
     <div className="flex flex-wrap gap-2">
@@ -105,9 +99,7 @@ export function ChatDrawer({
                   className="flex items-center gap-3 px-3 py-3 -mx-1 rounded-lg cursor-pointer transition-colors duration-150 hover:bg-accent active:bg-accent/80 active:scale-[0.98] transform"
                 >
                   {item.icon === "House" && <House className="w-4 h-4 shrink-0" />}
-                  {item.icon === "Captions" && (
-                    <Captions className="w-4 h-4 shrink-0" />
-                  )}
+                  {item.icon === "Captions" && <Captions className="w-4 h-4 shrink-0" />}
                   {item.icon === "Instagram" && (
                     <Image
                       src="/icons/Instagram.png"
@@ -153,9 +145,7 @@ export function ChatDrawer({
                               type="button"
                               onClick={() => onSelectConversation(conv.id)}
                               className={`w-full flex flex-col items-start gap-0.5 px-3 py-2.5 -mx-1 rounded-lg text-left transition-colors duration-150 hover:bg-accent active:bg-accent/80 ${
-                                currentConversationId === conv.id
-                                  ? "bg-accent/80"
-                                  : ""
+                                currentConversationId === conv.id ? "bg-accent/80" : ""
                               }`}
                             >
                               <span className="text-sm font-medium truncate max-w-full">

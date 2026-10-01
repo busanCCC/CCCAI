@@ -34,7 +34,9 @@ export function InAppBrowserToast() {
     window.sessionStorage.setItem(IN_APP_BROWSER_TOAST_SESSION_KEY, "true");
 
     if (browserType === "kakaotalk") {
-      toast("카카오톡 브라우저에서는 일부 기능이 불안정할 수 있어요. 외부 브라우저 사용을 권장해요.");
+      toast(
+        "카카오톡 브라우저에서는 일부 기능이 불안정할 수 있어요. 외부 브라우저 사용을 권장해요.",
+      );
       return;
     }
 

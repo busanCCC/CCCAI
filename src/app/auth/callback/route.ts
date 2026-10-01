@@ -26,7 +26,8 @@ export async function GET(request: NextRequest) {
   const appUrl = getAppUrl(request);
   const requestUrl = new URL(request.url);
   const code = requestUrl.searchParams.get("code");
-  const next = request.cookies.get(AUTH_NEXT_COOKIE)?.value || requestUrl.searchParams.get("next") || "/";
+  const next =
+    request.cookies.get(AUTH_NEXT_COOKIE)?.value || requestUrl.searchParams.get("next") || "/";
   const safeNext = next.startsWith("/") ? next : "/";
 
   if (!code) {

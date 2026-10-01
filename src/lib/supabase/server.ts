@@ -7,24 +7,20 @@ export async function createSupabaseServerClient() {
   const cookieStore = await cookies();
   const { SUPABASE_URL, SUPABASE_PUBLISHABLE_DEFAULT_KEY } = getSupabaseEnv();
 
-  return createServerClient(
-    SUPABASE_URL,
-    SUPABASE_PUBLISHABLE_DEFAULT_KEY,
-    {
-      cookies: {
-        getAll() {
-          return cookieStore.getAll();
-        },
-        setAll(cookiesToSet) {
-          try {
-            cookiesToSet.forEach(({ name, value, options }) => {
-              cookieStore.set(name, value, options);
-            });
-          } catch {
-            // noop: cookies can be read-only in some server execution paths.
-          }
-        },
+  return createServerClient(SUPABASE_URL, SUPABASE_PUBLISHABLE_DEFAULT_KEY, {
+    cookies: {
+      getAll() {
+        return cookieStore.getAll();
+      },
+      setAll(cookiesToSet) {
+        try {
+          cookiesToSet.forEach(({ name, value, options }) => {
+            cookieStore.set(name, value, options);
+          });
+        } catch {
+          // noop: cookies can be read-only in some server execution paths.
+        }
       },
     },
-  );
+  });
 }

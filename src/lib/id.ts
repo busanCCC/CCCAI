@@ -29,7 +29,6 @@ export function normalizeGuestUserId(userId: string) {
 export function isGuestUserId(userId: string | null | undefined) {
   return Boolean(
     userId &&
-      (userId.startsWith(GUEST_USER_ID_PREFIX) ||
-        userId.startsWith(LEGACY_GUEST_USER_ID_PREFIX)),
+    (userId.startsWith(GUEST_USER_ID_PREFIX) || userId.startsWith(LEGACY_GUEST_USER_ID_PREFIX)),
   );
 }

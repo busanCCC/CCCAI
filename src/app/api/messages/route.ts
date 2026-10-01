@@ -21,10 +21,7 @@ export async function GET(request: NextRequest) {
     const { searchParams } = new URL(request.url);
     const conversationId = searchParams.get("conversation_id");
     if (!conversationId || conversationId.length === 0) {
-      return Response.json(
-        { error: "conversation_id is required" },
-        { status: 400 },
-      );
+      return Response.json({ error: "conversation_id is required" }, { status: 400 });
     }
 
     const { DIFY_BASE_URL, DIFY_API_KEY } = getServerEnv();

@@ -65,7 +65,8 @@ export function useConversationHistory({
 
   return {
     conversations,
-    isLoading: isAuthenticated && (query.isPending || (query.isFetching && conversations.length === 0)),
+    isLoading:
+      isAuthenticated && (query.isPending || (query.isFetching && conversations.length === 0)),
     isLoadingMore: query.isFetchingNextPage,
     hasMore: isAuthenticated && Boolean(query.hasNextPage),
     error: isAuthenticated && !isUnauthorizedError ? error : null,

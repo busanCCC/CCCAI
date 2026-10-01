@@ -192,10 +192,7 @@ type StopChatGenerationParams = {
   userId: string;
 };
 
-export async function stopChatGeneration({
-  taskId,
-  userId,
-}: StopChatGenerationParams) {
+export async function stopChatGeneration({ taskId, userId }: StopChatGenerationParams) {
   const response = await fetch(`/api/chat/${taskId}/stop`, {
     method: "POST",
     headers: {

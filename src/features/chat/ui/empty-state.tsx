@@ -1,10 +1,7 @@
 "use client";
 import Image from "next/image";
 
-
-
 export function EmptyState() {
-
   return (
     <div className="flex min-h-[60dvh] flex-col items-center justify-center gap-6">
       <div className="w-full max-w-130 px-4">

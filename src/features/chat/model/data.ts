@@ -7,7 +7,7 @@ export const EXAMPLE_QUESTIONS = [
   "죄고백을 쉽게 설명해줘.",
   "순원에게 어떻게 다가가야할까?",
   "인제대에 대해 알려줘.",
-  "부산지구 책임 간사님이 누구야?"
+  "부산지구 책임 간사님이 누구야?",
 ];
 
 export function getRandomExampleQuestions(count = 2) {

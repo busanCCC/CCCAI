@@ -1,6 +1,10 @@
 "use client";
 // NOTE: 대화 메시지 히스토리 조회 및 앱 메시지 형식 변환
-import type { DifyMessagesResponse, DifyMessage, ConversationMessage } from "@/features/history/model/types";
+import type {
+  DifyMessagesResponse,
+  DifyMessage,
+  ConversationMessage,
+} from "@/features/history/model/types";
 
 export async function fetchMessages(
   conversationId: string,

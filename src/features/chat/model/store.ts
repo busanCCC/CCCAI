@@ -25,10 +25,7 @@ type ChatState = {
   status: ChatStatus;
   errorMessage: string | null;
   processingStatus: string | null;
-  hydrateSession: (
-    authUserId?: string | null,
-    options?: HydrateSessionOptions,
-  ) => void;
+  hydrateSession: (authUserId?: string | null, options?: HydrateSessionOptions) => void;
   startNewConversation: () => void;
   addUserMessage: (text: string) => void;
   startAssistantMessage: () => string;
@@ -74,11 +71,7 @@ export const useChatStore = create<ChatState>((set, get) => ({
       ? readConversationId(nextUserId)
       : null;
 
-    if (
-      currentUserId &&
-      currentUserId !== nextUserId &&
-      isGuestUserId(currentUserId)
-    ) {
+    if (currentUserId && currentUserId !== nextUserId && isGuestUserId(currentUserId)) {
       removeConversationId(currentUserId);
     }
 

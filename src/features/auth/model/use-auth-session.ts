@@ -28,9 +28,7 @@ type AuthSessionEventDetail = {
 
 function emitAuthSessionChanged(detail: AuthSessionEventDetail) {
   if (typeof window === "undefined") return;
-  window.dispatchEvent(
-    new CustomEvent<AuthSessionEventDetail>(AUTH_SESSION_EVENT, { detail }),
-  );
+  window.dispatchEvent(new CustomEvent<AuthSessionEventDetail>(AUTH_SESSION_EVENT, { detail }));
 }
 
 async function fetchSession(): Promise<AuthSessionResponse> {
@@ -91,10 +89,7 @@ export function useAuthSession(): AuthSessionState {
       isMounted = false;
       window.removeEventListener("focus", onFocus);
       document.removeEventListener("visibilitychange", onVisibilityChange);
-      window.removeEventListener(
-        AUTH_SESSION_EVENT,
-        onAuthSessionChanged as EventListener,
-      );
+      window.removeEventListener(AUTH_SESSION_EVENT, onAuthSessionChanged as EventListener);
     };
   }, []);
 
@@ -105,9 +100,7 @@ export function useAuthSession(): AuthSessionState {
     });
 
     if (!response.ok) {
-      const result = (await response.json().catch(() => null)) as
-        | { error?: string }
-        | null;
+      const result = (await response.json().catch(() => null)) as { error?: string } | null;
       throw new Error(result?.error || "로그아웃 중 오류가 발생했습니다.");
     }
 

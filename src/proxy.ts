@@ -1,11 +1,33 @@
+import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
 
-import { updateSupabaseSession } from "@/lib/supabase/middleware";
+import { siteConfig } from "@/lib/site";
 
-export async function proxy(request: NextRequest) {
-  return updateSupabaseSession(request);
+// Retire the browser app before its old handlers can call Dify or Supabase.
+export function proxy(request: NextRequest) {
+  if (request.nextUrl.pathname.startsWith("/api/")) {
+    return NextResponse.json(
+      {
+        error: "WEB_CHAT_RETIRED",
+        message: "씨앗순장과의 대화는 카카오톡에서 이어가 주세요.",
+        kakao_url: siteConfig.kakaoChatUrl,
+      },
+      { status: 410, headers: { "Cache-Control": "no-store" } },
+    );
+  }
+
+  return NextResponse.redirect(new URL("/", request.url));
 }
 
 export const config = {
-  matcher: ["/((?!_next/static|_next/image|favicon.ico|.*\\.(?:svg|png|jpg|jpeg|gif|webp)$).*)"],
+  matcher: [
+    "/login",
+    "/onboarding",
+    "/auth/:path*",
+    "/api/chat/:path*",
+    "/api/conversations",
+    "/api/messages",
+    "/api/auth/:path*",
+    "/api/profile/:path*",
+  ],
 };
